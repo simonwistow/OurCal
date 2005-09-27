@@ -1,0 +1,16 @@
+<html>
+<head>
+	<title>[% title %]</title>
+	<link rel="stylesheet" type="text/css" href="[% IMAGES %]/style.css">
+</head>
+<body bgcolor="#ffffff">
+
+
+[% USE Chump %]
+
+
+[% USE urlmaker=url('http://thegestalt.org/simon/cal/') %]
+
+[% INCLUDE style.css %]
+
+<center>

@@ -1,0 +1,35 @@
+package  OurCal::Dbi;
+
+use DBI;
+
+my $dbh = undef; # Global DBH handler
+
+#my $db  = 'cal';
+my $db  = 'gestalt';
+my $u   = 'simon';
+my $p   = 'ij894jio';
+sub get_dbh
+{
+        # if it's already defined return it
+        return $dbh if (defined $dbh);
+
+       # otherwise do a new connection to the DBH
+       $dbh = DBI->connect("dbi:mysql:$db",$u,$p) || die "Erk\n";
+
+        return $dbh;
+
+}
+
+sub trim {
+	my($self, $text) = @_;
+
+	$text =~ s/^\s*(.+=?)\$/$1/;
+
+	return $text;
+
+
+}
+
+1;
+
+

@@ -1,0 +1,70 @@
+[% INCLUDE header
+	title = day.as_string
+%]
+
+[% USE url('/simon/cal/') %]
+
+
+[% INCLUDE bar
+	left_link   = day.prev_link
+	left        = "<< $day.prev_string"
+	right_link  = day.next_link
+	right       = "$day.next_string >>"
+	center      = day.month_string
+	center_link = day.month_link
+%]
+
+
+
+
+<table width="600" border="0" cellpadding="0" cellspacing="0">
+<tr>
+	<td width="10"> &nbsp; </td>
+	<td width="590">
+		<a href="[% url(date = day.date) %]"><span class="boldlight">[% day.as_string %]</span></a>
+	</td>
+</tr>
+<tr>
+	<td colspan="2" valign="middle" align="center" height="10">
+		<img src="[% IMAGES %]/dots.gif" width="600" height="1" border="0">
+	</td>
+</tr>
+
+
+[% FOREACH event = day.get_events %]
+
+<tr>
+	<td width="10"> &nbsp; </td>
+	</td>
+	<td width="590" align="left">
+		<span class="plain"> 
+			[% event.description FILTER chump %]
+			&nbsp;<a href="[% url(date=day.date, del_event=event.description) %]"><small>delete</small></a>
+		</span>
+	</td>
+</tr>
+<tr>
+	<td colspan="2" valign="middle" align="center" height="10">
+		<img src="[% IMAGES %]/dots.gif" width="600" height="1" border="0">
+	</td>
+</tr>
+
+
+
+[% END %]
+
+
+<tr> 
+       <td width="10"> &nbsp; </td>
+	<td class="header" width="590">
+	<p>&nbsp;</p>
+	<form method="GET">
+		<input type="hidden" name="date" value="[% day.date %]">
+		New event : <input name="new_event" type="text" size="60" />
+		<input type="image" value="add" valign="middle" src="[% IMAGES %]/add.gif">
+	</form>
+	</td>
+</tr>
+</table>
+
+[% INCLUDE footer %]
