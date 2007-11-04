@@ -11,6 +11,4 @@
 
 [% USE urlmaker=url('http://thegestalt.org/simon/cal/') %]
 
-[% INCLUDE style.css %]
-
 <center>

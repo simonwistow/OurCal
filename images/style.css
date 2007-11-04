@@ -1,6 +1,16 @@
 <style type="text/css">
 <!--
 
+input.submit {
+   color:#555;
+   font-family:'trebuchet ms',helvetica,sans-serif;
+   font-size:10%;
+   font-weight:bold;
+   background-color:#fff;
+}
+
+
+
 table.calendar {
 
 }

@@ -13,10 +13,8 @@ sub get_dbh
        return $dbh if (defined $dbh);
 
        # otherwise do a new connection to the DBH
-       $dbh = DBI->connect("dbi:mysql:$db",$u,$p) || die "Erk\n";
-
+       $dbh = DBI->connect("dbi:mysql:$db",$u,$p) || die "Erk  - couldn't connect to db $db\n";
        return $dbh;
-
 }
 
 sub trim {

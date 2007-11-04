@@ -38,8 +38,14 @@
 	</td>
 	<td width="590" align="left">
 		<span class="plain"> 
+			<form method="POST">
+			 <input type="hidden" name="date" value="[% day.date %]">
+			 <input type="hidden" name="del_event" value="[% event.description %]">
 			[% event.description FILTER chump %]
-			&nbsp;<a href="[% url(date=day.date, del_event=event.description) %]"><small>delete</small></a>
+			<!-- &nbsp;<a href="[% url(date=day.date, del_event=event.description) %]"><small>delete</small></a>-->
+			&nbsp;
+			<input type="submit" value="delete" style="background-color:#fff; border: none; color:#555; font-family:'trebuchet ms',helvetica,sans-serif;">
+			</form>
 		</span>
 	</td>
 </tr>

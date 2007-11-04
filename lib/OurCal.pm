@@ -1,11 +1,12 @@
 package OurCal;
 
 use strict;
-use Date::Simple;
 use OurCal::Day;
 use OurCal::Month;
 use base 'OurCal::Dbi';
 use Data::Dumper;
+use Date::Simple ();
+#use Date::Simple::NoXS;
 
 sub new {
     my $class     = shift;
@@ -16,23 +17,30 @@ sub new {
         
 
 
-
     if (length $date == 10) {
         $self->{mode} = 'day';
-    } else {
+    } elsif (length $date == 7)  {
         $self->{mode} = 'month';
         $date        .= "-01" 
-
+    } elsif (length $date == 4) {
+        $self->{mode} = 'year';
+        $date        .= "-01-01";
+    } else {
+        $self->{mode} = 'month';
+        $date         = _get_default_date()."-01";
     }
 
+
     eval {
-        $self->{date} = Date::Simple->new($date);
+        $self->{date} = Date::Simple->new("$date");
     }; 
 
     if ($@) {
         $date = _get_default_date();
-        $self->{date} = Date::Simple->new($date."-01");
+        $self->{date} = Date::Simple->new("$date-01");
     }
+
+    #print STDERR "OC::new d=".$self->{date}." from $date\n";
 
 
     bless $self, $class;
@@ -42,7 +50,6 @@ sub new {
 sub mode {
     my $self = shift;
     return $self->{mode};
-
 }
 
 
@@ -72,9 +79,8 @@ sub _get_default_date {
 
     my ($mon, $year) = (localtime)[4,5];
     my $default      = ($year+1900)."-";
-       $default        .= '0' if ($mon<9);
-       $default        .= ($mon+1);
-
+       $default     .= '0' if ($mon<9);
+       $default     .= ($mon+1);
     return $default;
 }
 
@@ -104,5 +110,24 @@ sub get_todos {
 }
 
 
+sub get_raw_events {
+         my ($self) = @_;
+         my $dbh  = $self->SUPER::get_dbh();
+
+         my $sql  = "select * from events order by date desc limit 50";
+
+         my $sth  =  $dbh->prepare($sql);
+         $sth->execute();
+
+         my @events;
+
+         while (my $d = $sth->fetchrow_hashref()) {
+                push @events, $d;
+         }
+
+         return @events;
+
+
+}
 
 1;

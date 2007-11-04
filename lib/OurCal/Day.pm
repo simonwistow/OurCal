@@ -55,16 +55,15 @@ sub make_link {
 sub has_events {
 
      my ($self) = @_;
-         my $date = $self->{date};
+     my $date = $self->{date};
      my $dbh  = $self->SUPER::get_dbh();
+     my $sql  = "select count(*) from events where date=?";
+     my $sth  =  $dbh->prepare($sql);
+         
+     $sth->execute($date);
+     my ($events) = $sth->fetchrow_array();
 
-         my $sql  = "select count(*) from events where date='?'";
-
-         my $sth  =  $dbh->prepare($sql);
-         $sth->execute($date);
-         my ($events) = $sth->fetchrow_array();
-
-         return $events;
+     return $events;
 }
 
    
@@ -73,7 +72,7 @@ sub get_events {
          my $date = $self->{date};
          my $dbh  = $self->SUPER::get_dbh();
         
-         my $sql  = "select * from events where date='?'";
+         my $sql  = "select * from events where date=?";
         
          my $sth  =  $dbh->prepare($sql);
          $sth->execute($date);
@@ -82,20 +81,16 @@ sub get_events {
  
          while (my $d = $sth->fetchrow_hashref()) {
              $d->{date} = $date;
-                my $e = OurCal::Event->new($d);
-                push @events, $e;
-        
+             my $e = OurCal::Event->new($d);
+             push @events, $e;
          }
-
          return @events;
-        
-
 }
 
 
 sub next_link {
         my $self=shift;
-    my $day=$self->{date}+1;
+        my $day=$self->{date}+1;
        
         return sprintf "?date=%s", $day;
 }
@@ -111,7 +106,7 @@ sub next_string {
 
 sub prev_link {
         my $self=shift;
-    my $day=$self->{date}-1;
+        my $day=$self->{date}-1;
        
         return sprintf "?date=%s", $day;
 }
@@ -125,11 +120,6 @@ sub prev_string {
 
 
 }
-
-    
-
-
-
 
 
 sub month_string {
@@ -145,9 +135,8 @@ sub month_link {
 sub as_string {
     my $self = shift;
         
-        my $day = ordinate($self->{date}->day());
-                
-        return $self->{date}->format("%A the $day of %B, %Y");
+    my $day = ordinate($self->{date}->day());
+    return $self->{date}->format("%A the $day of %B, %Y");
                 
 }
            
