@@ -2,53 +2,39 @@ package OurCal::Event;
 use base 'OurCal::Dbi';
 
                 
-        sub new {
-                my ($class, $stuff) = @_;
-                return bless $stuff, $class;   
-        }
+        
+sub new {
+    my ($class, $stuff) = @_;
+    return bless $stuff, $class;   
+}
                 
-        sub description {
-                my $self = shift;
-                
-                return $self->{description};
-                
-        }
+sub description {
+    my $self = shift;
+    return $self->{description};
+}
          
                 
 
-	sub save {
-        	my ($self) = @_;
-		    my $description = $self->SUPER::trim($self->{description});
-        	my $dbh = $self->SUPER::get_dbh();
-        	my $date = $self->{date};
+sub save {
+    my ($self) = @_;
+    my $desc = $self->SUPER::trim($self->{description});
+    my $dbh  = $self->SUPER::get_dbh();
+    my $date = $self->{date};
+    my $sql  = sprintf "insert into events ('date','description') values (?,?)";
+    my $sth  =  $dbh->prepare($sql);
 
-        	#my $sql  = sprintf "insert into events ('date','description') values ('$date',%s)",
-            #                                                            $dbh->quote($description);
+    $sth->execute($date, $desc);
+}
 
-        	my $sql  = sprintf "insert into events values ('$date',%s)",
-                                                                        $dbh->quote($description);
+sub del  {
+    my ($self) = @_;
+    my $desc = $self->SUPER::trim($self->{description});
+    my $dbh  = $self->SUPER::get_dbh();
+    my $date = $self->{date};
+    my $sql  = sprintf "delete from events where date=? and description=?";
+    my $sth  =  $dbh->prepare($sql);
 
-        	my $sth  =  $dbh->prepare($sql);
-        	
-			# return unless defined  $sth; 
-
-			$sth->execute();
-
-
-	}
-
-	sub del  {
-        	my ($self) = @_;
-		my $description = $self->SUPER::trim($self->{description});
-        	my $dbh = $self->SUPER::get_dbh();
-        	my $date = $self->{date};
-
-        	my $sql  = sprintf "delete from events where date=%s and description=%s",
-                                                                        $dbh->quote($date),
-                                                                        $dbh->quote($description);
-
-	        my $sth  =  $dbh->prepare($sql);
-        	$sth->execute();
+    $sth->execute($date, $desc);
 }
 1;
 

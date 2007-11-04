@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl  -w
 
-use lib '/home/simon/public_html/cal/lib';
+use lib 'lib';
 
 use strict;
 use CGI();
@@ -16,7 +16,7 @@ my $cgi          = CGI->new();
 
 print $cgi->header();
 
-my $template     = Template->new({ INCLUDE => 'templates', RELATIVE => 1});
+my $template     = Template->new({ INCLUDE_PATH => 'templates', RELATIVE => 1});
 my $vars         = {};
 
 $vars->{sub} = sub { return sub { return uc $_[1] } };
