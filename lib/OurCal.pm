@@ -122,11 +122,11 @@ sub get_raw_events {
 
          my $sth;      
          if (defined $self->{user}) {
-             my $sql  = "SELECT * FROM events WHERE user IS NULL OR user=? ORDER BY date DATE LIMIT ?";
+             my $sql  = "SELECT * FROM events WHERE user IS NULL OR user=? ORDER BY date LIMIT ?";
              $sth  =  $dbh->prepare($sql);
              $sth->execute($self->{user}, $limit);
         } else {
-             my $sql  = "SELECT * FROM events WHERE user IS NULL ORDER BY date DATE LIMIT ?";
+             my $sql  = "SELECT * FROM events WHERE user IS NULL ORDER BY date LIMIT ?";
              $sth  =  $dbh->prepare($sql);
              $sth->execute($limit);
         }
