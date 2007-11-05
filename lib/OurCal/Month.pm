@@ -3,16 +3,17 @@ package OurCal::Month;
 use strict;
 use Date::Simple;
 use base qw(OurCal::Dbi);
+use Carp qw(confess);
 
 sub new {
-    my ($class, $date)  = @_;
+    my ($class, %what)  = @_;
     
-    my $self = {};
-    $self->{date} = $date;
-    bless $self, $class;
+    my $self = bless \%what, $class;
 
     $self->{next} = $self->_get_next();
     $self->{prev} = $self->_get_prev();
+    confess "No date set" unless defined $self->{date};
+
 
     return $self;
 
@@ -134,6 +135,8 @@ sub _get_next {
         my $self = shift;
         my $date = $self->{date};
 
+    confess "No date set" unless defined $self->{date};
+
         my $year  = $date->year();
         my $month = $date->month();
 
@@ -188,7 +191,9 @@ sub days {
 
     for (my $day = 1; $day<=$self->last_day(); $day++) {
         my $date = sprintf "%d-%.2d-%.2d", $year, $month, $day;
-        push @days, OurCal::Day->new(Date::Simple->new($date));        
+        my %what = ( date => Date::Simple->new($date) );
+        $what{user} = $self->{user} if defined $self->{user};
+        push @days, OurCal::Day->new(%what);        
     }
 
     return @days;

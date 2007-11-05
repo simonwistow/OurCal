@@ -9,13 +9,10 @@ use Date::Simple ();
 
 
 sub new {
-    my ($class, $date)  = @_;
-    
-    my $self = {};
-    $self->{date} = $date;
+    my ($class, %what)  = @_;
 
 
-    bless $self, $class;
+    bless \%what, $class;
 
 }
 
@@ -57,10 +54,15 @@ sub has_events {
      my ($self) = @_;
      my $date = $self->{date};
      my $dbh  = $self->SUPER::get_dbh();
-     my $sql  = "select count(*) from events where date=?";
-     my $sth  =  $dbh->prepare($sql);
-         
-     $sth->execute($date);
+
+     my @vals;
+     my $sql  = "SELECT COUNT(*) FROM events WHERE date=?";
+     if (defined $self->{user}) {
+        $sql .= " AND (user IS NULL OR user=?)";
+        push @vals, $self->{user};
+     }
+     my $sth  =  $dbh->prepare($sql);     
+     $sth->execute($date, @vals);
      my ($events) = $sth->fetchrow_array();
 
      return $events;
@@ -71,11 +73,16 @@ sub get_events {
          my ($self) = @_;
          my $date = $self->{date};
          my $dbh  = $self->SUPER::get_dbh();
-        
-         my $sql  = "select * from events where date=?";
-        
+       
+         my @vals; 
+         my $sql  = "SELECT * FROM events WHERE date=?";
+         if (defined $self->{user}) {
+            $sql .= " AND (user IS NULL OR user=?)";
+            push @vals, $self->{user};
+         }
+       
          my $sth  =  $dbh->prepare($sql);
-         $sth->execute($date);
+         $sth->execute($date, @vals);
 
          my @events;
  

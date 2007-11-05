@@ -11,11 +11,11 @@ use Date::Simple ();
 sub new {
     my $class     = shift;
     my $date      = shift || "";
-
+    my $user      = shift;
     my $self      = {};
 
         
-
+    $self->{user} = $user;
 
     if (length $date == 10) {
         $self->{mode} = 'day';
@@ -35,13 +35,11 @@ sub new {
         $self->{date} = Date::Simple->new("$date");
     }; 
 
+    
     if ($@) {
         $date = _get_default_date();
         $self->{date} = Date::Simple->new("$date-01");
     }
-
-    #print STDERR "OC::new d=".$self->{date}." from $date\n";
-
 
     bless $self, $class;
     
@@ -61,16 +59,18 @@ sub date {
 
 sub day {
     my $self = shift;
-    
-    return OurCal::Day->new($self->{date});
+    my %what = ( date => $self->{date} );
+    $what{user} = $self->{user} if defined $self->{user};
+    return OurCal::Day->new(%what);
 
 }
 
 
 sub month {
     my $self = shift;
-    
-    return OurCal::Month->new($self->{date});
+    my %what = ( date => $self->{date} );
+    $what{user} = $self->{user} if defined $self->{user};    
+    return OurCal::Month->new(%what);
 
 }
 
@@ -90,11 +90,15 @@ sub get_todos {
          my ($self) = @_;
          my $date = $self->{date};
          my $dbh  = $self->SUPER::get_dbh();
-        
-         my $sql  = "select * from todos";
-        
+
+         my @vals;
+         my $sql  = "SELECT * FROM todos";        
+         if (defined $self->{user}) {
+            $sql .= " WHERE user IS NULL OR user=?";
+            push @vals, $self->{user};
+         }
          my $sth  =  $dbh->prepare($sql);
-         $sth->execute();
+         $sth->execute(@vals);
 
          my @todos;
  
@@ -111,13 +115,21 @@ sub get_todos {
 
 
 sub get_raw_events {
-         my ($self) = @_;
-         my $dbh  = $self->SUPER::get_dbh();
+         my $self  = shift;
+         my $limit = shift || 50; 
+         my $dbh   = $self->SUPER::get_dbh();
+    
 
-         my $sql  = "select * from events order by date desc limit 50";
-
-         my $sth  =  $dbh->prepare($sql);
-         $sth->execute();
+         my $sth;      
+         if (defined $self->{user}) {
+             my $sql  = "SELECT * FROM events WHERE user IS NULL OR user=? ORDER BY date DATE LIMIT ?";
+             $sth  =  $dbh->prepare($sql);
+             $sth->execute($self->{user}, $limit);
+        } else {
+             my $sql  = "SELECT * FROM events WHERE user IS NULL ORDER BY date DATE LIMIT ?";
+             $sth  =  $dbh->prepare($sql);
+             $sth->execute($limit);
+        }
 
          my @events;
 
