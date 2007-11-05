@@ -39,7 +39,7 @@
 	<td width="590" align="left">
 		<span class="plain"> 
 			[% event.description FILTER chump %]
-			[% del_form("del_event", event.id) %]
+			[% del_form({ "del_event" =>  event.id, date => day.date }) %]
 		</span>
 	</td>
 </tr>
@@ -58,9 +58,14 @@
        <td width="10"> &nbsp; </td>
 	<td class="header" width="590">
 	<p>&nbsp;</p>
-	<form method="GET">
+    [% url = "?date=$day.date" %]
+    [% url = "$url&user=$user" IF user.length %]
+	<form method="POST" action="[% url %] ">
 		<input type="hidden" name="date" value="[% day.date %]">
 		New event : <input name="new_event" type="text" size="60" />
+        [% IF user %]
+        <input type="hidden" name="user" value="[% user %]" />
+        [% END %]
 		<input type="image" value="add" valign="middle" src="[% IMAGES %]/add.gif">
 	</form>
 	</td>

@@ -21,7 +21,7 @@
         [% ELSE %]
                 [% tdclass= "$class" %]
         [% END %]
-	<td class="[% tdclass %]" width="83" height="83" align="center"><a href="[% day.make_link %]" class="[% class %]">[% day.day_of_month %]</a></td>
+	<td class="[% tdclass %]" width="83" height="83" align="center"><a href="[% day.make_link %][% "&user=$user" IF user %]" class="[% class %]">[% day.day_of_month %]</a></td>
 [% IF day.day_of_week==7 && day.date.day != month.last_day %]
 </tr>
 <tr height="83">

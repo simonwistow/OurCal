@@ -4,6 +4,8 @@
 
 [% USE url ('/simon/cal/') %]
 
+[% this_month= month.date.replace("-01$","") %]
+
 
 [% INCLUDE bar
 	left_link=month.prev_link
@@ -77,7 +79,7 @@
 
 	        <span class="plain"> 
                         [% todo.description FILTER chump %]
-						[% del_form("del_todo", todo.id) %]
+						[% del_form({"del_todo" => todo.id, date = this_month }) %]
                 </span>
         </td>
 </tr>
@@ -96,8 +98,14 @@
        <td width="10"> &nbsp; </td>
         <td class="header" width="590">
         <p>&nbsp;</p>
-        <form method="GET">
+        [% url = "?date=$this_month" %]
+        [% url = "$url&user=$user" IF user.length %]
+
+        <form method="POST">
                 New todo : <input name="new_todo" type="text" size="60" />
+                [% IF user.length %]
+                  <input type="hidden" name="user" value="[% user %]" />
+                [% END %]
                 <input type="image" value="add" valign="middle" src="[% IMAGES %]/add.gif">
         </form>
         </td>

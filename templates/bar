@@ -5,17 +5,17 @@
 	<td height="40" width="20" align="right"><img src="[% IMAGES %]/bar_left_end.gif" width="20" height="40" border="0" alt=""></td>
 
 	<td height="40" width="75" background="[% IMAGES %]/bar_left.gif" valign="middle"> 
-		<a href="[% left_link %]"><span class="plain"><span class="number">[% left %]</span></span></a> 
+		<a href="[% left_link %][% "&user=$user" IF user %]"><span class="plain"><span class="number">[% left %]</span></span></a> 
 	</td>
 
 	<td height="40" width="430" background="[% IMAGES %]/bar_right.gif" valign="middle" align="center">
 
-	<a href="[% center_link %]"><center><span class="plain"><span class="number">[% center %]</span></span></center></a>
+	<a href="[% center_link %][% "&user=$user" IF user %]"><center><span class="plain"><span class="number">[% center %]</span></span></center></a>
 
 	</td>
 
 	<td height="40" width="75" background="[% IMAGES %]/bar_left.gif" align="right" valign="middle">
-		<a href="[% right_link %]"><span class="plain"><span class="number">[% right %]</span></span></a>
+		<a href="[% right_link %][% "&user=$user" IF user %]"><span class="plain"><span class="number">[% right %]</span></span></a>
 	</td>
 
 	<td height="40" width="20"><img width="20" height="40" border="0" alt="" src="[% IMAGES %]/bar_right_end.gif"></td>
