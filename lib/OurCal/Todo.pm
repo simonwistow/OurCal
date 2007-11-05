@@ -15,11 +15,15 @@ sub new {
 
     return bless $stuff, $class;   
 }
-                
+
+sub id {
+	my $self = shift;
+	return $self->{id};
+}                
         
 sub description {
     my $self = shift;
-    return $self->{description};
+    return $self->SUPER::trim($self->{description});
 }
         
 sub for {
@@ -35,7 +39,7 @@ sub save  {
     my $sql    = sprintf "insert into todos  ('description') values (?)";
     my $sth  =  $dbh->prepare($sql);
     
-    $sth->execute($self->{description});
+    $sth->execute($self->description);
 }
 
 sub del {
@@ -43,7 +47,7 @@ sub del {
         my $dbh    = $self->SUPER::get_dbh();
         my $sql    = sprintf "delete from todos where description=?";
         my $sth    =  $dbh->prepare($sql);
-        $sth->execute($self->{description});
+        $sth->execute($self->description);
 }
 
 sub full_description {
@@ -53,11 +57,11 @@ sub full_description {
 
     my $description;
     if (defined $for) {
-        $description = sprintf "(%s) %s", $for, $self->{description};
+        $description = sprintf "(%s) %s", $for, $self->description;
     } else {
-        $description = sprintf "%s", $self->{description};
+        $description = sprintf "%s", $self->description;
     }
-    return $self->SUPER::trim($description);
+    return $description;
 }
 
 

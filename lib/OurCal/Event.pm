@@ -10,14 +10,18 @@ sub new {
                 
 sub description {
     my $self = shift;
-    return $self->{description};
+    return $self->SUPER::trim($self->{description});
 }
          
                 
+sub id {
+	my $self = shift;
+	return $self->{id};
+}
 
 sub save {
     my ($self) = @_;
-    my $desc = $self->SUPER::trim($self->{description});
+    my $desc = $self->description;
     my $dbh  = $self->SUPER::get_dbh();
     my $date = $self->{date};
     my $sql  = "insert into events ('date','description') values (?,?)";
@@ -28,7 +32,7 @@ sub save {
 
 sub del  {
     my ($self) = @_;
-    my $desc = $self->SUPER::trim($self->{description});
+    my $desc = $self->description;
     my $dbh  = $self->SUPER::get_dbh();
     my $date = $self->{date};
     my $sql  = "delete from events where date=? and description=?";
