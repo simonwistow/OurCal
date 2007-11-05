@@ -1,4 +1,4 @@
-[% INCLUDE header
+[% PROCESS header
 	title = month.as_string
 %]
 
@@ -77,7 +77,7 @@
 
 	        <span class="plain"> 
                         [% todo.description FILTER chump %]
-                        &nbsp;<a href="[% url(del_todo = todo.full_description) %]"><small>delete</small></a>
+						[% del_form("del_todo", todo.id) %]
                 </span>
         </td>
 </tr>

@@ -7,7 +7,7 @@
 
 
 [% USE Chump %]
-
+[% PROCESS macros %]
 
 [% USE urlmaker=url('http://thegestalt.org/simon/cal/') %]
 

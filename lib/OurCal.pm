@@ -100,7 +100,7 @@ sub get_todos {
  
          while (my $d = $sth->fetchrow_hashref()) {
         
-                my $t = OurCal::Todo->new($d->{description});
+                my $t = OurCal::Todo->new(%$d);
                 push @todos, $t;
         
          }

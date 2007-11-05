@@ -81,7 +81,7 @@ sub get_events {
  
          while (my $d = $sth->fetchrow_hashref()) {
              $d->{date} = $date;
-             my $e = OurCal::Event->new($d);
+             my $e = OurCal::Event->new(%$d);
              push @events, $e;
          }
          return @events;

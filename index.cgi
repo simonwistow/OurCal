@@ -29,9 +29,9 @@ my $cal  = OurCal->new($cgi->param('date'));
 my $mode = $cal->mode();
 
 if ($cgi->param('new_todo')) {
-	my $t = OurCal::Todo->new($cgi->param('new_todo'))->save();
+	my $t = OurCal::Todo->new(description => $cgi->param('new_todo'))->save();
 } elsif ($cgi->param('del_todo')) {
-	my $t = OurCal::Todo->new($cgi->param('del_todo'))->del();
+	my $t = OurCal::Todo->new(id => $cgi->param('del_todo'))->del();
 }
 
 
@@ -43,9 +43,9 @@ if ($mode eq 'day') {
 	
 
 	if ($cgi->param('new_event')) {
-		my $e = OurCal::Event->new({date => $cal->date(), description=>$cgi->param('new_event')})->save();
+		my $e = OurCal::Event->new(date => $cal->date(), description => $cgi->param('new_event'))->save();
 	} elsif ($cgi->param('del_event')) {
-		my $e = OurCal::Event->new({date => $cal->date(), description=>$cgi->param('del_event')})->del();
+		my $e = OurCal::Event->new(id => $cgi->param('del_event') )->del();
 	}
 
 

@@ -4,8 +4,8 @@ use base 'OurCal::Dbi';
                 
         
 sub new {
-    my ($class, $stuff) = @_;
-    return bless $stuff, $class;   
+    my ($class, %event) = @_;
+    return bless \%event, $class;   
 }
                 
 sub description {
@@ -24,7 +24,7 @@ sub save {
     my $desc = $self->description;
     my $dbh  = $self->SUPER::get_dbh();
     my $date = $self->{date};
-    my $sql  = "insert into events ('date','description') values (?,?)";
+    my $sql  = "INSERT INTO events (date, description) VALUES (?, ?)";
     my $sth  = $dbh->prepare($sql);
 
     $sth->execute($date, $desc);
@@ -32,13 +32,11 @@ sub save {
 
 sub del  {
     my ($self) = @_;
-    my $desc = $self->description;
     my $dbh  = $self->SUPER::get_dbh();
-    my $date = $self->{date};
-    my $sql  = "delete from events where date=? and description=?";
+    my $sql  = "DELETE FROM events WHERE id=?";
     my $sth  = $dbh->prepare($sql);
 
-    $sth->execute($date, $desc);
+    $sth->execute($self->id);
 }
 1;
 
