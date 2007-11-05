@@ -16,7 +16,7 @@ use URI::Find::Simple qw(list_uris);
 my $tc = Text::Chump->new;
 my $ourcal  = OurCal->new();
 my $cal = Data::ICal->new();
-my @events = $ourcal->get_raw_events;
+my @events = $ourcal->get_raw_events(param('limit'));
 
 $tc->install('link', sub { return "$_[2] ($_[1])" });
 
