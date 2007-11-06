@@ -3,149 +3,103 @@ package OurCal::Day;
 use strict;
 use OurCal::Event;
 use Lingua::EN::Numbers::Ordinate;
-use base qw(OurCal::Dbi);
-use Date::Simple ();
+use base qw(OurCal::Span);
 
-
-
-sub new {
-    my ($class, %what)  = @_;
-
-
-    bless \%what, $class;
-
-}
 
 sub day_of_week {
     my $self = shift;
-    return $self->{date}->format("%u");
+    return $self->{_dt}->strftime("%u");
 }
 
 sub day_of_month {
-        my $self = shift;
-        return $self->{date}->day();
+    my $self = shift;
+    return $self->{_dt}->strftime("%d");
+}
+
+sub is_first_day_of_month {
+    my $self = shift;
+    return $self->{_dt}->month != 
+           $self->{_dt}->clone->subtract( days => 1)->month;
+}
+
+sub is_last_day_of_month {
+    my $self = shift;
+    return $self->{_dt}->month != 
+           $self->{_dt}->clone->add( days => 1)->month;
 }
 
 sub is_today {
-    my $self =shift;
-        my $d = $self->{date}->day();
-        my $m = $self->{date}->month();
-        my $y = $self->{date}->year();
-
-        my ($td,$tm,$ty) = (localtime)[3,4,5];
-            $tm+=1;
-            $ty+=1900;
-
-        return 1 if ($td==$d && $tm==$m && $ty==$y);
-
-        return 0;
-}
-
-sub make_link {
     my $self = shift;
-    my $date = $self->{date};
-
-    return sprintf "?date=%d-%.2d-%.2d", $date->year(), $date->month(), $date->day();
-
+    my $now  = DateTime->now->truncate( to => 'day' );
+    return $now == $self->{_dt};
 }
 
 sub has_events {
+    my $self = shift;
+    my $sth  = $self->_events(1);     
+    my ($events) = $sth->fetchrow_array();
+    return $events;
+}
 
-     my ($self) = @_;
-     my $date = $self->{date};
-     my $dbh  = $self->SUPER::get_dbh();
+sub month {
+    my $self = shift;
+    my $date = $self->{_dt}->clone->truncate( to => 'month')->strftime("%Y-%m");
+    return $self->_span("OurCal::Month", $date);
+}
 
-     my @vals;
-     my $sql  = "SELECT COUNT(*) FROM events WHERE date=?";
-     if (defined $self->{user}) {
+sub events {
+    my $self = shift;
+    my $sth  = $self->_events(0);
+    my @events;
+    while (my $d = $sth->fetchrow_hashref()) {
+        $d->{date} = $self->date;
+        my $e = OurCal::Event->new(%$d);
+        push @events, $e;
+    }
+    return @events;
+}
+   
+sub _events {
+    my ($self, $count) = @_;
+    my $date = $self->date;
+    my $dbh  = $self->SUPER::get_dbh();
+    my $what = ($count)? "COUNT(*)" : "*";           
+
+    my @vals; 
+    my $sql  = "SELECT $what FROM events WHERE date=?";
+    if (defined $self->{user}) {
         $sql .= " AND (user IS NULL OR user=?)";
         push @vals, $self->{user};
-     }
-     my $sth  =  $dbh->prepare($sql);     
-     $sth->execute($date, @vals);
-     my ($events) = $sth->fetchrow_array();
-
-     return $events;
-}
-
-   
-sub get_events {
-         my ($self) = @_;
-         my $date = $self->{date};
-         my $dbh  = $self->SUPER::get_dbh();
-       
-         my @vals; 
-         my $sql  = "SELECT * FROM events WHERE date=?";
-         if (defined $self->{user}) {
-            $sql .= " AND (user IS NULL OR user=?)";
-            push @vals, $self->{user};
-         }
-       
-         my $sth  =  $dbh->prepare($sql);
-         $sth->execute($date, @vals);
-
-         my @events;
- 
-         while (my $d = $sth->fetchrow_hashref()) {
-             $d->{date} = $date;
-             my $e = OurCal::Event->new(%$d);
-             push @events, $e;
-         }
-         return @events;
+    }
+    my $sth  =  $dbh->prepare($sql);
+    $sth->execute($date, @vals);
+    return $sth;
 }
 
 
-sub next_link {
-        my $self=shift;
-        my $day=$self->{date}+1;
-       
-        return sprintf "?date=%s", $day;
-}
-
-sub next_string {
-        my $self=shift;
-        my $day=$self->{date}+1;
-
-        return $day->format("%d/%m");
-
-
-}
-
-sub prev_link {
-        my $self=shift;
-        my $day=$self->{date}-1;
-       
-        return sprintf "?date=%s", $day;
-}
-
-
-sub prev_string {
-        my $self=shift;
-        my $day=$self->{date}-1;
-
-        return $day->format("%d/%m");
-
-
-}
-
-
-sub month_string {
-    my $self = shift;
-    return $self->{date}->format("%b, %Y");
-}
-
-sub month_link {
-    my $self = shift;
-    return sprintf "?date=%d-%.2d",  $self->{date}->year(),  $self->{date}->month();
-}
 
 sub as_string {
     my $self = shift;
-        
-    my $day = ordinate($self->{date}->day());
-    return $self->{date}->format("%A the $day of %B, %Y");
-                
+    my $day = ordinate($self->{_dt}->day());
+    return $self->{_dt}->strftime("%d/%m");
 }
+
+sub as_long_string {
+    my $self = shift;
+    my $day = ordinate($self->{_dt}->day());
+    return $self->{_dt}->strftime("%A the $day of %B, %Y");
+}
+
+sub prev {
+    my $self = shift;
+    return $self->_shift($self->{_dt}->clone->subtract( days => 1 )->strftime("%Y-%m-%d"));
+}
+
+sub next {
+    my $self = shift;
+    return $self->_shift($self->{_dt}->clone->add( days => 1 )->strftime("%Y-%m-%d"));
+}
+
            
            
 

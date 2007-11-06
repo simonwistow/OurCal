@@ -9,62 +9,41 @@ use CGI::Carp qw(fatalsToBrowser);
 use Template;
 use OurCal;
 use OurCal::Todo;
+use OurCal::Handler;
+
+my $handler = OurCal::Handler->new;
+my $cal     = OurCal->new( date => $handler->date, user => $handler->user );
+my $mode    = $handler->mode;
 
 
-# set up the vars and defaults
-my $cgi          = CGI->new();
+if ("ics" eq $mode) {
+    my $ical = OurCal::ICalendar->new($cal);
+    print $ical->header;
+    print $ical->events($handler->limit);
+    exit 0;
+}
 
-print $cgi->header();
-
-my $template     = Template->new({ INCLUDE_PATH => 'templates', RELATIVE => 1});
-my $vars         = {};
-
-$vars->{sub} = sub { return sub { return uc $_[1] } };
-
-
-
-
-# get the date
-my $cal  = OurCal->new($cgi->param('date'), $cgi->param('user'));
-my $mode = $cal->mode();
-
-if ($cgi->param('new_todo')) {
-    my %what = (description => $cgi->param('new_todo'));
-    $what{user} = $cgi->param('user') if $cgi->param('user');
-    my $t = OurCal::Todo->new(%what)->save();
-} elsif ($cgi->param('del_todo')) {
-    my $t = OurCal::Todo->new(id => $cgi->param('del_todo'))->del();
+if ("new_todo" eq $mode) {
+    $cal->new_todo($handler->description);
+} elsif ("del_todo" eq $mode) {
+    $cal->del_todo($handler->id);
+} elsif ("new_event" eq $mode) {
+    $cal->new_event($handler->description);
+} elsif ("del_event" eq $mode) {
+    $cal->del_event($handler->id);
 }
 
 
-$vars->{testing} = sub { return 'foo' };
+my $span = $cal->span_name;
+my $vars = {
+    image_url  => 'images',
+    handler    => $handler,
+    calendar   => $cal,
+    $span      => $cal->span,
+};
+my $template = Template->new({ INCLUDE_PATH => 'templates', RELATIVE => 1}) || die "${Template::ERROR}\n";
 
-if ($mode eq 'day') {
-
-    my $day = $cal->day();
-    if ($cgi->param('new_event')) {
-        my %what = (date => $cal->date(), description => $cgi->param('new_event'));
-        $what{user} = $cgi->param('user') if $cgi->param('user'); 
-        my $e = OurCal::Event->new(%what)->save();
-    } elsif ($cgi->param('del_event')) {
-        my $e = OurCal::Event->new(id => $cgi->param('del_event') )->del();
-    }
-
-
-    $vars->{day}    = $day;
-
-
-
-} else {
-    $vars->{month}  = $cal->month(); 
-}
-
-
-$vars->{IMAGES} = 'images';
-$vars->{user}   = $cgi->param('user') if defined $cgi->param('user');
-$vars->{todos}  = $cal->get_todos();
-
-
-$template->process("$mode",$vars) 
-    || die "Template process failed: ", $template->error(), "\n";
+print $handler->header;
+$template->process($span,$vars) 
+    || die "Template process failed: ".$template->error()."\n";
 

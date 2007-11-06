@@ -5,90 +5,56 @@ use OurCal::Day;
 use OurCal::Month;
 use base 'OurCal::Dbi';
 use Data::Dumper;
-use Date::Simple ();
-#use Date::Simple::NoXS;
 
 sub new {
     my $class     = shift;
-    my $date      = shift || "";
-    my $user      = shift;
-    my $self      = {};
-
-        
-    $self->{user} = $user;
-
-    if (length $date == 10) {
-        $self->{mode} = 'day';
-    } elsif (length $date == 7)  {
-        $self->{mode} = 'month';
-        $date        .= "-01" 
-    } elsif (length $date == 4) {
-        $self->{mode} = 'year';
-        $date        .= "-01-01";
-    } else {
-        $self->{mode} = 'month';
-        $date         = _get_default_date()."-01";
-    }
-
-
-    eval {
-        $self->{date} = Date::Simple->new("$date");
-    }; 
-
-    
-    if ($@) {
-        $date = _get_default_date();
-        $self->{date} = Date::Simple->new("$date-01");
-    }
-
-    bless $self, $class;
-    
+    my %opts      = @_;
+    return bless \%opts, $class;
 }
-
-sub mode {
-    my $self = shift;
-    return $self->{mode};
-}
-
 
 sub date {
+    return $_[0]->{date};
+}
+
+sub user {
+    return $_[0]->{user};
+}
+
+
+sub span_name {
     my $self = shift;
-    return $self->{date};
+    my $date = $self->date;
+    if (10 == length($date)) {
+        return 'day';
+    } elsif (7 == length($date)) {
+        return 'month';
+    } elsif (4 == length($date)) {
+        return 'year';
+    } else {
+        die "Unknown date type for $date\n";
+    }
 }
 
 
-sub day {
+
+sub span {
     my $self = shift;
-    my %what = ( date => $self->{date} );
-    $what{user} = $self->{user} if defined $self->{user};
-    return OurCal::Day->new(%what);
+    my $name = $self->span_name;
+    my $date = $self->date;
+    my %what = ( date => $date, calendar => $self );
+    if ('month' eq $name) {
+        return OurCal::Month->new(%what);
+    } elsif ('day' eq $name) {
+        return OurCal::Day->new(%what);
+    } 
 
+    die "Don't have a handler for $name\n";
 }
-
-
-sub month {
-    my $self = shift;
-    my %what = ( date => $self->{date} );
-    $what{user} = $self->{user} if defined $self->{user};    
-    return OurCal::Month->new(%what);
-
-}
-
-
-sub _get_default_date {
-
-    my ($mon, $year) = (localtime)[4,5];
-    my $default      = ($year+1900)."-";
-       $default     .= '0' if ($mon<9);
-       $default     .= ($mon+1);
-    return $default;
-}
-
 
 
 sub get_todos {
          my ($self) = @_;
-         my $date = $self->{date};
+
          my $dbh  = $self->SUPER::get_dbh();
 
          my @vals;
@@ -101,45 +67,43 @@ sub get_todos {
          $sth->execute(@vals);
 
          my @todos;
- 
          while (my $d = $sth->fetchrow_hashref()) {
-        
                 my $t = OurCal::Todo->new(%$d);
                 push @todos, $t;
-        
          }
-
          return \@todos;
             
 }
 
 
-sub get_raw_events {
-         my $self  = shift;
-         my $limit = shift || 50; 
-         my $dbh   = $self->SUPER::get_dbh();
-    
+sub new_todo {
+    my $self = shift;
+    my $desc = shift;
+    my %what = ( description => $desc );
+    $what{user} = $self->user if defined $self->user;
+    OurCal::Todo->new(%what)->save(); 
+}
 
-         my $sth;      
-         if (defined $self->{user}) {
-             my $sql  = "SELECT * FROM events WHERE user IS NULL OR user=? ORDER BY date DESC LIMIT ?";
-             $sth  =  $dbh->prepare($sql);
-             $sth->execute($self->{user}, $limit);
-        } else {
-             my $sql  = "SELECT * FROM events WHERE user IS NULL ORDER BY date DESC LIMIT ?";
-             $sth  =  $dbh->prepare($sql);
-             $sth->execute($limit);
-        }
+sub del_todo {
+    my $self = shift;
+    my $id   = shift;
+    OurCal::Todo->new( id => $id )->del();
+}
 
-         my @events;
+sub new_event {
+    my $self = shift;
+    my $desc = shift;
+    die "Can't add an event to anything but a day\n" 
+        unless $self->span_name eq 'day';
+    my %what = ( description => $desc, date => $self->date );
+    $what{user} = $self->user if defined $self->user;
+    OurCal::Event->new(%what)->save();
+}    
 
-         while (my $d = $sth->fetchrow_hashref()) {
-                push @events, $d;
-         }
-
-         return @events;
-
-
+sub del_event {
+    my $self = shift;
+    my $id   = shift;
+    OurCal::Event->new( id => $id )->del();
 }
 
 1;

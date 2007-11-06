@@ -5,12 +5,12 @@
 [% END %]
 </tr>
 
-
+[% days = month.days %]
 <tr height="83">
-[% FOREACH [2..month.first_day_of_week] %]
-	<td width="83" height="83" class="noevent">&nbsp;</td>
+[% FOREACH [2..days.0.day_of_week] %]
+    <td width="83" height="83" class="noevent">&nbsp;</td>
 [% END %]
-[% FOREACH day = month.days %]
+[% FOREACH day = days %]
         [% IF day.has_events %]
                 [% class='event' %]
         [% ELSE %]
@@ -21,13 +21,13 @@
         [% ELSE %]
                 [% tdclass= "$class" %]
         [% END %]
-	<td class="[% tdclass %]" width="83" height="83" align="center"><a href="[% day.make_link %][% "&user=$user" IF user %]" class="[% class %]">[% day.day_of_month %]</a></td>
-[% IF day.day_of_week==7 && day.date.day != month.last_day %]
+    <td class="[% tdclass %]" width="83" height="83" align="center"><a href="[% handler.link(day) %]" class="[% class %]">[% day.day_of_month %]</a></td>
+[% IF day.day_of_week==7 && !day.is_last_day_of_month %]
 </tr>
 <tr height="83">
 [% END %]
 [% END %]
-[% FOREACH [month.last_day_of_week..6] %]
+[% FOREACH [days.-1.day_of_week .. 6] %]
 <td width="83" height="83" class="noevent">&nbsp;</td>
 [% END %]
 </tr>
