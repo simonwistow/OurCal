@@ -15,8 +15,8 @@ sub description {
          
                 
 sub id {
-	my $self = shift;
-	return $self->{id};
+    my $self = shift;
+    return $self->{id};
 }
 
 sub save {
@@ -24,10 +24,18 @@ sub save {
     my $desc = $self->description;
     my $dbh  = $self->SUPER::get_dbh();
     my $date = $self->{date};
-    my $sql  = "INSERT INTO events (date, description) VALUES (?, ?)";
+    my $sql;
+    my @vals = ($date, $desc);
+    if (defined $self->{user}) {
+        $sql  = "INSERT INTO events (date, description, user) VALUES (?, ?, ?)";
+        push @vals, $self->{user};
+    } else {
+        $sql  = "INSERT INTO events (date, description) VALUES (?, ?)";
+    }
+
     my $sth  = $dbh->prepare($sql);
 
-    $sth->execute($date, $desc);
+    $sth->execute(@vals);
 }
 
 sub del  {

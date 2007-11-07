@@ -8,8 +8,8 @@ sub new {
 }
 
 sub id {
-	my $self = shift;
-	return $self->{id};
+    my $self = shift;
+    return $self->{id};
 }                
         
 sub description {
@@ -26,19 +26,28 @@ sub for {
                 
 sub save  {
     my ($self) = @_;
+    my $desc   = $self->full_description;
     my $dbh    = $self->SUPER::get_dbh();
-    my $sql    = "INSERT INTO todos (description) VALUES (?)";
-    my $sth  =  $dbh->prepare($sql);
-    
-    $sth->execute($self->description);
+
+    my $sql;
+    my @vals = ($desc);
+    if (defined $self->{user}) {
+        $sql  = "INSERT INTO todos (description, user) VALUES (?, ?)";
+        push @vals, $self->{user};
+    } else {
+        $sql  = "INSERT INTO todos (description) VALUES (?)";
+    }
+    my $sth  = $dbh->prepare($sql);
+
+    $sth->execute(@vals);
 }
 
 sub del {
-        my ($self) = @_;
-        my $dbh    = $self->SUPER::get_dbh();
-        my $sql    = "DELETE FROM todos WHERE id=?";
-        my $sth    = $dbh->prepare($sql);
-        $sth->execute($self->id);
+    my ($self) = @_;
+    my $dbh    = $self->SUPER::get_dbh();
+    my $sql    = "DELETE FROM todos WHERE id=?";
+    my $sth    = $dbh->prepare($sql);
+    $sth->execute($self->id);
 }
 
 sub full_description {

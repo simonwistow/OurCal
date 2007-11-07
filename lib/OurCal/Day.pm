@@ -70,7 +70,10 @@ sub _events {
     if (defined $self->{user}) {
         $sql .= " AND (user IS NULL OR user=?)";
         push @vals, $self->{user};
+    } else {
+        $sql .= " AND user IS NULL";
     }
+
     my $sth  =  $dbh->prepare($sql);
     $sth->execute($date, @vals);
     return $sth;

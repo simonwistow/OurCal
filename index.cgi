@@ -12,13 +12,12 @@ use OurCal::Todo;
 use OurCal::Handler;
 
 my $handler = OurCal::Handler->new;
-my $cal     = OurCal->new( date => $handler->date, user => $handler->user );
 my $mode    = $handler->mode;
-
+my $cal     = OurCal->new( date => $handler->date, user => $handler->user );
 
 if ("ics" eq $mode) {
     my $ical = OurCal::ICalendar->new($cal);
-    print $ical->header;
+    print $handler->header($ical->mime_type);
     print $ical->events($handler->limit);
     exit 0;
 }

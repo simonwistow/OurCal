@@ -42,6 +42,7 @@ sub span {
     my $name = $self->span_name;
     my $date = $self->date;
     my %what = ( date => $date, calendar => $self );
+    $what{user} = $self->{user} if defined $self->{user};
     if ('month' eq $name) {
         return OurCal::Month->new(%what);
     } elsif ('day' eq $name) {
@@ -58,9 +59,9 @@ sub get_todos {
          my $dbh  = $self->SUPER::get_dbh();
 
          my @vals;
-         my $sql  = "SELECT * FROM todos";        
+         my $sql  = "SELECT * FROM todos WHERE user IS NULL";        
          if (defined $self->{user}) {
-            $sql .= " WHERE user IS NULL OR user=?";
+            $sql .= " OR user=?";
             push @vals, $self->{user};
          }
          my $sth  =  $dbh->prepare($sql);
@@ -73,6 +74,20 @@ sub get_todos {
          }
          return \@todos;
             
+}
+
+sub users {
+    my ($self) = @_;
+    my $dbh    = $self->SUPER::get_dbh();
+    my @tables = qw(todos events);
+    my $sql    = join " UNION ", map { "SELECT user from $_ WHERE user IS NOT NULL" } @tables;      
+    my $sth    =  $dbh->prepare($sql);
+    $sth->execute();
+    my @users;
+    while (my $row = $sth->fetchrow_arrayref) {
+        push @users, $row->[0];
+    }
+    return @users;
 }
 
 

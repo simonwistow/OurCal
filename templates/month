@@ -72,7 +72,7 @@
         [% IF todo.for %]<span class="bolddark">[% todo.for %]&nbsp;</span>[% END %]
         <span class="plain"> 
              [% todo.description FILTER chump %]
-             [% del_form({"mode" => "del_todo", "id" => todo.id }) %]
+             [% del_form(month, {"mode" => "del_todo", "id" => todo.id }) %]
          </span>
         </td>
 </tr>
@@ -91,7 +91,7 @@
        <td width="10"> &nbsp; </td>
         <td class="header" width="590">
         <p>&nbsp;</p>
-        <form method="POST">
+        <form method="POST" action="[% handler.link(month) %]">
                 New todo : <input name="description" type="text" size="60" />
                 [% IF handler.need_user %] 
                 <input type="hidden" name="user" value="[% handler.user %]" />

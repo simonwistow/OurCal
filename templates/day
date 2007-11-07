@@ -39,7 +39,7 @@
     <td width="590" align="left">
         <span class="plain"> 
             [% event.description FILTER chump %]
-            [% del_form({ "mode" => "del_event", "id" =>  event.id }) %]
+            [% del_form(day, { "mode" => "del_event", "id" =>  event.id }) %]
         </span>
     </td>
 </tr>
@@ -60,8 +60,7 @@
     <p>&nbsp;</p>
     [% url = "?date=$day.date" %]
     [% url = "$url&user=$user" IF user.length %]
-    <form method="POST">
-        <input type="hidden" name="date" value="[% day.date %]">
+    <form method="POST" action=[% handler.link(day) %] >
         New event : <input name="description" type="text" size="60" />
         [% IF handler.need_user %]
         <input type="hidden" name="user" value="[% handler.user %]" />

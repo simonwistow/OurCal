@@ -22,4 +22,8 @@
 
     </tr>
 </table>
-
+[% IF handler.user.length %] 
+<p>
+Logged in as: [% handler.user %] [% del_form(calendar.span, { "mode" => "del_cookie", "command" => "logout" }) %]
+</p>
+[% END %]
