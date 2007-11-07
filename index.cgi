@@ -10,15 +10,16 @@ use Template;
 use OurCal;
 use OurCal::Todo;
 use OurCal::Handler;
+use OurCal::ICalendar;
 
 my $handler = OurCal::Handler->new;
 my $mode    = $handler->mode;
 my $cal     = OurCal->new( date => $handler->date, user => $handler->user );
 
 if ("ics" eq $mode) {
-    my $ical = OurCal::ICalendar->new($cal);
+    my $ical = OurCal::ICalendar->new( calendar => $cal, user => $handler->user );
     print $handler->header($ical->mime_type);
-    print $ical->events($handler->limit);
+    print $ical->events($handler->param('limit'));
     exit 0;
 }
 
