@@ -1,5 +1,2 @@
-* Separate out into Providers
-* Make ICalendar.pm not have SQL
 * Make User management UI
 * Have 'users' table 
-* Config file
