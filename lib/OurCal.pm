@@ -3,7 +3,6 @@ package OurCal;
 use strict;
 use OurCal::Day;
 use OurCal::Month;
-use base 'OurCal::Dbi';
 use Data::Dumper;
 
 sub new {
@@ -42,7 +41,7 @@ sub span {
     my $name = $self->span_name;
     my $date = $self->date;
     my %what = ( date => $date, calendar => $self );
-    $what{user} = $self->{user} if defined $self->{user};
+    $what{user} = $self->{user} if defined $self->user;
     if ('month' eq $name) {
         return OurCal::Month->new(%what);
     } elsif ('day' eq $name) {
@@ -53,72 +52,58 @@ sub span {
 }
 
 
-sub get_todos {
-         my ($self) = @_;
+sub events {
+    my $self = shift;
+    my %opts = @_;
+    use Carp qw(confess);
+    use Data::Dumper;
+    #confess(Dumper(\%opts));
+    $opts{user} = $self->user if defined $self->user; 
+    return $self->{provider}->events(%opts);
+}
 
-         my $dbh  = $self->SUPER::get_dbh();
+sub has_events {
+    my $self = shift;
+    my %opts = @_;
+    $opts{user} = $self->user if defined $self->user; 
+    return $self->{provider}->has_events(%opts);
+}
 
-         my @vals;
-         my $sql  = "SELECT * FROM todos WHERE user IS NULL";        
-         if (defined $self->{user}) {
-            $sql .= " OR user=?";
-            push @vals, $self->{user};
-         }
-         my $sth  =  $dbh->prepare($sql);
-         $sth->execute(@vals);
-
-         my @todos;
-         while (my $d = $sth->fetchrow_hashref()) {
-                my $t = OurCal::Todo->new(%$d);
-                push @todos, $t;
-         }
-         return \@todos;
-            
+sub todos {
+    my $self = shift;
+    my %opts = @_;
+    $opts{user} = $self->user if defined $self->user; 
+    return $self->{provider}->todos(%opts);
 }
 
 sub users {
-    my ($self) = @_;
-    my $dbh    = $self->SUPER::get_dbh();
-    my @tables = qw(todos events);
-    my $sql    = join " UNION ", map { "SELECT user from $_ WHERE user IS NOT NULL" } @tables;      
-    my $sth    =  $dbh->prepare($sql);
-    $sth->execute();
-    my @users;
-    while (my $row = $sth->fetchrow_arrayref) {
-        push @users, $row->[0];
-    }
-    return @users;
+    my $self = shift;
+    return $self->{provider}->users;
 }
 
 
-sub new_todo {
+sub save_todo {
     my $self = shift;
-    my $desc = shift;
-    my %what = ( description => $desc );
-    $what{user} = $self->user if defined $self->user;
-    OurCal::Todo->new(%what)->save(); 
+    my $todo = shift;
+    $self->{provider}->save_todo($todo)
 }
 
 sub del_todo {
     my $self = shift;
-    my $id   = shift;
-    OurCal::Todo->new( id => $id )->del();
+    my $todo = shift;
+    $self->{provider}->del_todo($todo);
 }
 
-sub new_event {
-    my $self = shift;
-    my $desc = shift;
-    die "Can't add an event to anything but a day\n" 
-        unless $self->span_name eq 'day';
-    my %what = ( description => $desc, date => $self->date );
-    $what{user} = $self->user if defined $self->user;
-    OurCal::Event->new(%what)->save();
+sub save_event {
+    my $self  = shift;
+    my $event = shift;
+    $self->{provider}->save_event($event);
 }    
 
 sub del_event {
-    my $self = shift;
-    my $id   = shift;
-    OurCal::Event->new( id => $id )->del();
+    my $self  = shift;
+    my $event = shift;
+    $self->{provider}->del_event($event);
 }
 
 1;

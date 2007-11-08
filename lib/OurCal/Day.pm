@@ -34,51 +34,25 @@ sub is_today {
     return $now == $self->{_dt};
 }
 
-sub has_events {
-    my $self = shift;
-    my $sth  = $self->_events(1);     
-    my ($events) = $sth->fetchrow_array();
-    return $events;
-}
-
 sub month {
     my $self = shift;
     my $date = $self->{_dt}->clone->truncate( to => 'month')->strftime("%Y-%m");
     return $self->_span("OurCal::Month", $date);
 }
 
+sub has_events {
+    my $self = shift;
+    my $cal  = $self->calendar;
+    return $cal->has_events( date => $self->date );
+}
+
+
 sub events {
     my $self = shift;
-    my $sth  = $self->_events(0);
-    my @events;
-    while (my $d = $sth->fetchrow_hashref()) {
-        $d->{date} = $self->date;
-        my $e = OurCal::Event->new(%$d);
-        push @events, $e;
-    }
-    return @events;
+    my $cal  = $self->calendar;
+    return $cal->events( date => $self->date );
 }
    
-sub _events {
-    my ($self, $count) = @_;
-    my $date = $self->date;
-    my $dbh  = $self->SUPER::get_dbh();
-    my $what = ($count)? "COUNT(*)" : "*";           
-
-    my @vals; 
-    my $sql  = "SELECT $what FROM events WHERE date=?";
-    if (defined $self->{user}) {
-        $sql .= " AND (user IS NULL OR user=?)";
-        push @vals, $self->{user};
-    } else {
-        $sql .= " AND user IS NULL";
-    }
-
-    my $sth  =  $dbh->prepare($sql);
-    $sth->execute($date, @vals);
-    return $sth;
-}
-
 
 
 sub as_string {

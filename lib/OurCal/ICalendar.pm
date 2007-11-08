@@ -1,7 +1,6 @@
 package OurCal::ICalendar;
 
 use strict;
-use base qw(OurCal::Dbi);
 
 use Data::ICal::DateTime;
 use Data::ICal::Entry::Event;
@@ -24,22 +23,20 @@ sub mime_type {
 sub events {
     my $self   = shift;
     my %opts   = @_;
-    
     $opts{limit} ||= 50;
 
     my $tc     = Text::Chump->new;
-
     $tc->install('link', sub { return "$_[2] ($_[1])" });
 
+    my @events = $self->{calendar}->events(%opts);
     my $cal    = Data::ICal->new();
 
-    my @events = $self->_get_raw_events(%opts);
 
     foreach my $item (@events) {
        my $event = Data::ICal::Entry::Event->new;
-       my $date  = $self->_make_date($item->{date});
-       my $uid   = md5_hex($date.$item->{description});
-       my $desc  = $tc->chump($item->{description});
+       my $date  = $self->_make_date($item->date);
+       my $uid   = md5_hex($date.$item->description);
+       my $desc  = $tc->chump($item->description);
        my ($url) = list_uris($desc);
 
        # uid

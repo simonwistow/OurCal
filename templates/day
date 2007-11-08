@@ -65,7 +65,7 @@
         [% IF handler.need_user %]
         <input type="hidden" name="user" value="[% handler.user %]" />
         [% END %]
-        <input type="hidden" name="mode" value="new_event" />
+        <input type="hidden" name="mode" value="save_event" />
         <input type="hidden" name="date" value="[% day.date %]" />
         <input type="image" value="add" valign="middle" src="[% image_url %]/add.gif">
     </form>

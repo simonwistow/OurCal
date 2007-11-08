@@ -1,5 +1,4 @@
 package OurCal::Todo;
-use base 'OurCal::Dbi';
                 
 sub new {
     my ($class, %todo) = @_;
@@ -14,7 +13,7 @@ sub id {
         
 sub description {
     my $self = shift;
-    return $self->SUPER::trim($self->{description});
+    return $self->trim($self->{description});
 }
         
 sub for {
@@ -24,35 +23,8 @@ sub for {
 }
          
                 
-sub save  {
-    my ($self) = @_;
-    my $desc   = $self->full_description;
-    my $dbh    = $self->SUPER::get_dbh();
-
-    my $sql;
-    my @vals = ($desc);
-    if (defined $self->{user}) {
-        $sql  = "INSERT INTO todos (description, user) VALUES (?, ?)";
-        push @vals, $self->{user};
-    } else {
-        $sql  = "INSERT INTO todos (description) VALUES (?)";
-    }
-    my $sth  = $dbh->prepare($sql);
-
-    $sth->execute(@vals);
-}
-
-sub del {
-    my ($self) = @_;
-    my $dbh    = $self->SUPER::get_dbh();
-    my $sql    = "DELETE FROM todos WHERE id=?";
-    my $sth    = $dbh->prepare($sql);
-    $sth->execute($self->id);
-}
-
 sub full_description {
     my ($self) = @_;
-    my $dbh    = $self->SUPER::get_dbh();      
     my $for    = $self->{for};
 
     my $description;
@@ -64,6 +36,13 @@ sub full_description {
     return $description;
 }
 
+sub trim {
+    my($self, $text) = @_;
+
+    $text =~ s/^\s*(.+=?)\$/$1/;
+
+    return $text;
+}
 
 
 1;
