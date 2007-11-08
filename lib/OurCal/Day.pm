@@ -28,6 +28,11 @@ sub is_last_day_of_month {
            $self->{_dt}->clone->add( days => 1)->month;
 }
 
+sub is_this_span {
+	my $self = shift;
+	return $self->is_today;
+}
+
 sub is_today {
     my $self = shift;
     my $now  = DateTime->now->truncate( to => 'day' );

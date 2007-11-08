@@ -22,6 +22,18 @@ sub as_string {
     return $self->{_dt}->strftime("%b, %Y");
 }
 
+
+sub is_this_span {
+    my $self = shift;
+    return $self->is_this_month;
+}
+
+sub is_this_month {
+	my $self = shift;
+    my $now  = DateTime->now->truncate( to => 'month' );
+    return $now == $self->{_dt};
+}
+
 sub days {
     my $self = shift;
     my $dt   = $self->{_dt}->clone;
