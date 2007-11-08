@@ -104,17 +104,20 @@ sub link {
     my $span = shift;
     my $date = $span->date;
     my $user = $self->user;
-    my $url  = "?date=${date}";
-       $url .= "&user=${user}" if $self->need_user;
+    my $url  = "?";
+	
+    $url .= "date=${date}" unless $span->is_this_span && $span->isa("OurCal::Month");
+    $url .= "&user=${user}" if $self->need_user;
+	$url  = "." if $url eq "?";
 
     return $url;    
 }
 
 sub param {
-	my $self = shift;
-	my $name = shift;
-	my $cgi  = $self->{_cgi};
-	return $cgi->param($name);
+    my $self = shift;
+    my $name = shift;
+    my $cgi  = $self->{_cgi};
+    return $cgi->param($name);
 
 }
 
