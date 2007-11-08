@@ -8,12 +8,11 @@ sub new {
     my %what  = @_;
     my $conf  = $what{config}->config('providers');
     my %providers;
-    foreach my $what (keys %$conf) {
-        foreach my $name (split ' ', $conf->{$what}) {
-            my $class = $class."::".ucfirst(lc($what));
-            $class->require || die "Couldn't require class $class: $@\n";
-            $providers{$name} = $class->new( config => $what{config}->config($name) );
-        }
+    foreach my $name (keys %$conf) {
+        my $what     = $conf->{$name};
+        my $provider = $class."::".ucfirst(lc($what));
+        $provider->require || die "Couldn't require class $provider: $@\n";
+        $providers{$name} = $provider->new( config => $what{config}->config($name) );
     }
     die "You must provide a provider named 'default'\n" unless defined $providers{'default'};
     $what{_providers} = { %providers };
