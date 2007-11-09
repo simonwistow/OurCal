@@ -37,10 +37,13 @@
     <td width="10"> &nbsp; </td>
     </td>
     <td width="590" align="left">
-        <span class="plain"> 
+        <div class="vevent">
+        <abbr class="dtstart" style="visibility:hidden; font-size: 0px;" title="[% day.date %]">[% day.as_long_string %]</abbr>
+        <span class="summary"> 
             [% event.description FILTER chump %]
             [% del_form(day, { "mode" => "del_event", "id" =>  event.id }) %]
         </span>
+        </div>
     </td>
 </tr>
 <tr>
