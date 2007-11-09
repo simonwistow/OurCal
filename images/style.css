@@ -69,6 +69,7 @@ table.calendar td.todayevent {
 .boldlight      { color: #aaa096; font-style: normal; font-weight: bold; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
 .boldwhite { color: #fff; font-style: normal; font-weight: bold; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
 .plain      { color: #645a50; font-style: normal; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.summary      { color: #645a50; font-style: normal; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
 .plaindark   { color: #281e14; font-style: normal; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
 .plainitalic     { color: #645a50; font-style: italic; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
 .plainitaliclight      { color: #aaa096; font-style: italic; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
