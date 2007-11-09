@@ -49,10 +49,13 @@ sub events {
         my $s    = DateTime->new(%conf)->truncate( to => 'day');
         my $e    = $s->clone->add( days => 1)->subtract( seconds => 1 );
         my $span = DateTime::Span->from_datetimes( start => $s, end => $e );
-        push @vals, $span;
+        push @vals, $span, 'day';
     }
-    my @events  = sort { $a->start->epoch <=> $b->start->epoch } $cal->events(@vals);
-    @events = splice @events, 0, $opts{limit} if defined $opts{limit};
+	
+    my @events  = $cal->events(@vals);
+    @events     = map { $_->explode(@vals) } @events if @vals;
+	@events     = sort { $a->start->epoch <=> $b->start->epoch } @events;
+    @events     = splice @events, 0, $opts{limit} if defined $opts{limit};
     return map { $self->to_event($_) } @events;
 }
 
@@ -62,6 +65,7 @@ sub to_event {
     my %what;
     $what{date}        = $event->start->strftime("%Y-%m-%d");
     $what{description} = $event->summary;    
+    $what{recurring}   = $event->property('rrule') or $event->property('rdate'); 
     return OurCal::Event->new(%what);
 }
 

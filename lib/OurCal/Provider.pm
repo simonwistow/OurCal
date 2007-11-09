@@ -39,8 +39,11 @@ sub has_events {
 }
 
 sub events {
-    my $self = shift;
-    return $self->_gather('events', @_);
+    my $self   = shift;
+	my %opts   = @_;
+    my @events = sort { $b->date cmp $a->date } $self->_gather('events', %opts);
+    @events    = splice @events, 0, $opts{limit} if defined $opts{limit};
+	return @events;
 }
 
 sub users {

@@ -22,6 +22,11 @@ sub id {
     return $self->{id};
 }
 
+sub recurring {
+    my $self = shift;
+    return $self->{recurring};
+}
+
 sub trim {
     my($self, $text) = @_;
     $text =~ s/^\s*(.+=?)\$/$1/;
