@@ -63,26 +63,4 @@ sub _make_date {
     return DateTime->new( year => $y, month => $m, day => $d);
 }
 
-
-
-
-sub _get_raw_events {
-    my $self = shift;
-    my %opts = @_;
-    my $dbh  = $self->SUPER::get_dbh();
-    my @vals;
-    my $sql  = "SELECT * FROM events";
-    if (defined $self->{user}) {
-        $sql .= " WHERE (user IS NULL OR user=?)";
-        push @vals, $self->{user};
-    } else {
-        $sql .= " WHERE user IS NULL";
-    }
-    $sql .= " ORDER BY date DESC LIMIT ?";
-
-    my $sth = $dbh->prepare($sql);
-    $sth->execute(@vals, $opts{limit});
-    return @{$sth->fetchall_arrayref({})};
-}
-
 1;
