@@ -12,7 +12,7 @@ sub new {
         my $what     = $conf->{$name};
         my $provider = $class."::".ucfirst(lc($what));
         $provider->require || die "Couldn't require class $provider: $@\n";
-        $providers{$name} = $provider->new( config => $what{config}->config($name) );
+        $providers{$name} = $provider->new( config => $what{config}, name => $name );
     }
     die "You must provide a provider named 'default'\n" unless defined $providers{'default'};
     $what{_providers} = { %providers };
@@ -40,10 +40,10 @@ sub has_events {
 
 sub events {
     my $self   = shift;
-	my %opts   = @_;
+    my %opts   = @_;
     my @events = sort { $b->date cmp $a->date } $self->_gather('events', %opts);
     @events    = splice @events, 0, $opts{limit} if defined $opts{limit};
-	return @events;
+    return @events;
 }
 
 sub users {

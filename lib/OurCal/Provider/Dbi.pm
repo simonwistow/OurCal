@@ -7,7 +7,7 @@ use Carp qw(confess cluck);
 sub new {
     my $class  = shift;
     my %what   = @_;
-    my $conf   = $what{config};
+    my $conf   = $what{config}->config($what{name});
     
     $what{dbh} = DBI->connect($conf->{dsn}, $conf->{user}, $conf->{pass}) 
         || die "Erk - couldn't connect to db $conf->{dsn}: $DBI::errstr\n";

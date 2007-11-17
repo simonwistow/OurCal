@@ -11,7 +11,7 @@ use OurCal::Event;
 sub new {
     my $class = shift;
     my %what  = @_;
-    my $conf  = $what{config};
+    my $conf  = $what{config}->config($what{name});
     my $file  = $conf->{file};
     if ($file !~ m!^http://!) {
         $file = File::Spec->rel2abs($file);
@@ -51,10 +51,10 @@ sub events {
         my $span = DateTime::Span->from_datetimes( start => $s, end => $e );
         push @vals, $span, 'day';
     }
-	
+    
     my @events  = $cal->events(@vals);
     @events     = map { $_->explode(@vals) } @events if @vals;
-	@events     = sort { $a->start->epoch <=> $b->start->epoch } @events;
+    @events     = sort { $a->start->epoch <=> $b->start->epoch } @events;
     @events     = splice @events, 0, $opts{limit} if defined $opts{limit};
     return map { $self->to_event($_) } @events;
 }
