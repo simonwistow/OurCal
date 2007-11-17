@@ -27,6 +27,11 @@ sub recurring {
     return $self->{recurring};
 }
 
+sub editable {
+    my $self = shift;
+    return $self->{editable} || 0;
+}
+
 sub trim {
     my($self, $text) = @_;
     $text =~ s/^\s*(.+=?)\$/$1/;

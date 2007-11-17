@@ -21,6 +21,7 @@ sub events {
     my ($sth,$sql)  = $self->_events(%opts);
     my @events;
     while (my $d = $sth->fetchrow_hashref()) {
+        $d->{editable} = 1;
         my $e = OurCal::Event->new(%$d);
         push @events, $e;
     }

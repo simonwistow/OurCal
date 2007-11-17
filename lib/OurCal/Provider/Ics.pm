@@ -66,6 +66,7 @@ sub to_event {
     $what{date}        = $event->start->strftime("%Y-%m-%d");
     $what{description} = $event->summary;    
     $what{recurring}   = $event->property('rrule') or $event->property('rdate'); 
+    $what{editable}    = 0;
     return OurCal::Event->new(%what);
 }
 
