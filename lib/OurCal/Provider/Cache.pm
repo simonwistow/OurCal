@@ -13,7 +13,7 @@ sub new {
     $what{_provider}      = OurCal::Provider->load_provider($conf->{child}, $what{config}); 
     $what{_provider_name} = $conf->{child}; 
     $what{_cache_dir}     = $conf->{dir};
-    $what{_cache_expiry}  = 1000*60*30 unless defined $what{_cache_expiry};
+    $what{_cache_expiry}  = 60*30 unless defined $what{_cache_expiry};
     return bless \%what, $class;
 }
 
@@ -63,19 +63,28 @@ sub del_event {
 }
 
 sub _do_cached {
-    my $self  = shift;
-    my $sub   = shift;
-    my $thing = shift;
-    my $dir   = rel2abs($self->{_cache_dir});
-    -d $dir  || eval { mkpath($dir) } || die "Couldn't create cache directory $dir: $@\n";
-    my $file  = $self->{_provider_name}."+".$sub."@".$self->_flatten_args($thing, @_);
-    my $cache = catfile($dir, $file);    
-    my $mtime = $self->{_cache_expiry};
-    my @res   = ();
-    if (-e $cache && (time-(stat($cache))[9] > $mtime)) {
+    my $self   = shift;
+    my $sub    = shift;
+    my $thing  = shift;
+    my $file   = $self->{_provider_name}."+".$sub."@".$self->_flatten_args($thing, @_);
+      return $self->cache($file, sub { $self->{_provider}->$sub($thing, @_) });
+}
+
+sub cache {
+    my $self   = shift;
+    my $file   = shift;
+    my $sub    = shift;
+    my $dir    = rel2abs($self->{_cache_dir});
+    -d $dir   || eval { mkpath($dir) } || die "Couldn't create cache directory $dir: $@\n";
+    my $cache  = catfile($dir, $file);    
+    my $expire = $self->{_cache_expiry};
+    my $mtime  = (stat($cache))[9]; 
+    my $time   = time;
+    my @res    = ();
+    if (-e $cache && ($time-$mtime < $expire)) {
         @res  = @{Storable::retrieve( $cache )};
     } else {
-        @res = $self->{_provider}->$sub($thing, @_);
+        @res =  $sub->();
         Storable::store( [@res], $cache );
     }
     return @res;
@@ -84,12 +93,8 @@ sub _do_cached {
 sub _flatten_args {
     my $self = shift;
     my %opts = @_;
-    use Data::Dumper;
-#    die Dumper({%opts});
     my $flat = "";
-    foreach my $key (keys %opts) {
-        next if ref($opts{$key}) && !$opts{$key}->isa('DateTime');
-        # TODO Spans and Sets?
+    foreach my $key (sort keys %opts) {
         $flat .= "$key=$opts{$key};"
     }
     return $flat;
