@@ -41,7 +41,7 @@
         <abbr class="dtstart" style="visibility:hidden; font-size: 0px;" title="[% day.date %]">[% day.as_long_string %]</abbr>
         <span class="summary"> 
             [% event.description FILTER chump %]
-            [% del_form(day, { "mode" => "del_event", "id" =>  event.id }) %]
+            [% IF event.editable; del_form(day, { "mode" => "del_event", "id" =>  event.id }); END %]
         </span>
         </div>
     </td>
