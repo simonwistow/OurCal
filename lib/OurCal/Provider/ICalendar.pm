@@ -1,4 +1,4 @@
-package OurCal::Provider::Ics;
+package OurCal::Provider::ICalendar;
 
 use strict;
 use LWP::Simple;

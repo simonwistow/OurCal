@@ -1,4 +1,4 @@
-package OurCal::Provider::Dbi;
+package OurCal::Provider::DBI;
 
 use strict;
 use DBI;
