@@ -1,6 +1,5 @@
 * Make User management UI
 * Have 'users' table 
-* Make the ICalendar privder use OurCal::Provider::Cache to cache the getting of .ics file
 * Generic alternative View (not just ICalendar)
 * Cleanup index.cgi
 

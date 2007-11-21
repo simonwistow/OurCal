@@ -10,8 +10,10 @@ sub new {
     my $class = shift;
     my %what  = @_;
     my $conf  = $what{config}->config($what{name});
-    $what{_provider}      = OurCal::Provider->load_provider($conf->{child}, $what{config}); 
-    $what{_provider_name} = $conf->{child}; 
+    if (defined $conf->{child}) {
+        $what{_provider}      = OurCal::Provider->load_provider($conf->{child}, $what{config}); 
+        $what{_provider_name} = $conf->{child}; 
+    }
     $what{_cache_dir}     = $conf->{dir};
     $what{_cache_expiry}  = 60*30 unless defined $what{_cache_expiry};
     return bless \%what, $class;
@@ -66,10 +68,14 @@ sub _do_cached {
     my $self   = shift;
     my $sub    = shift;
     my $thing  = shift;
+    return unless defined $self->{_provider};    
     my $file   = $self->{_provider_name}."+".$sub."@".$self->_flatten_args($thing, @_);
-      return $self->cache($file, sub { $self->{_provider}->$sub($thing, @_) });
+    return $self->cache($file, sub { $self->{_provider}->$sub($thing, @_) });
 }
 
+# TODO perhaps the caching code should be refactored out into
+# ::Cache::Simple and ::Provider::Cache could take an optional
+# 'class' parameter. This will do for now though.
 sub cache {
     my $self   = shift;
     my $file   = shift;
@@ -103,7 +109,8 @@ sub _flatten_args {
 sub _do_default {
     my $self  = shift;
     my $sub   = shift;
-    my $thing = shift;    
+    my $thing = shift;
+    return unless defined $self->{_provider};    
     return $self->{_provider}->$sub($thing, @_);
 }
 

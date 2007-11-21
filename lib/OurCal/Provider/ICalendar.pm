@@ -7,6 +7,9 @@ use DateTime;
 use DateTime::Span;
 use File::Spec;
 use OurCal::Event;
+use OurCal::Provider;
+use Carp qw(cluck);
+use Digest::MD5 qw(md5_hex);
 
 sub new {
     my $class = shift;
@@ -17,7 +20,11 @@ sub new {
         $file = File::Spec->rel2abs($file);
         $file = "file://$file";
     }
-    $what{file} = $file;
+    $what{file}   = $file;
+    if ($conf->{cache}) {
+        $what{_cache} = OurCal::Provider->load_provider($conf->{cache}, $what{config}); 
+    }
+
     return bless \%what, $class;
 }
 
@@ -32,7 +39,7 @@ sub todos {
 sub events {
     my $self  = shift;
     my %opts  = @_;
-    my $data  = get($self->{file});
+    my $data  = $self->_fetch_data;
     return () unless $data;
     my $cal   = Data::ICal->new( data => $data );
     return () unless $cal;
@@ -57,6 +64,14 @@ sub events {
     @events     = sort { $a->start->epoch <=> $b->start->epoch } @events;
     @events     = splice @events, 0, $opts{limit} if defined $opts{limit};
     return map { $self->to_event($_) } @events;
+}
+
+
+sub _fetch_data {
+    my $self = shift;
+    return get($self->{file}) unless defined $self->{_cache};
+    my $file = $self->{name}."@".md5_hex($self->{file});    
+    return ($self->{_cache}->cache( $file, sub { get($self->{file}) }))[0];    
 }
 
 sub to_event {
