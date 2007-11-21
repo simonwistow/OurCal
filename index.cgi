@@ -14,7 +14,7 @@ $|++;
 my $config    = OurCal::Config->new( file => 'ourcal.conf' );
 my $provider  = OurCal::Provider->new( config => $config );
 my $handler   = OurCal::Handler->new;
-my $cal       = OurCal->new( date => $handler->date, user => $handler->user, provider => $provider );
+my $cal       = OurCal->new( date => $handler->date, user => $handler->user, config => $config );
 my $view      = OurCal::View->load_view($handler->view, config => $config->config, calendar => $cal); 
 
 

@@ -3,11 +3,13 @@ package OurCal;
 use strict;
 use OurCal::Day;
 use OurCal::Month;
+use OurCal::Provider;
 use Data::Dumper;
 
 sub new {
     my $class     = shift;
     my %opts      = @_;
+    $opts{provider} ||= OurCal::Provider->new(config => $opts{config});
     return bless \%opts, $class;
 }
 
