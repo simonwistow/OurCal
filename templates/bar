@@ -4,7 +4,7 @@
 
     <td height="40" width="20" align="right"><img src="[% image_url %]/bar_left_end.gif" width="20" height="40" border="0" alt=""></td>
 
-    <td height="40" width="75" background="[% image_url %]/bar_left.gif" valign="middle"> 
+    <td height="40" width="80" background="[% image_url %]/bar_left.gif" valign="middle"> 
         <a href="[% left_link %]"><span class="plain"><span class="number">[% left %]</span></span></a> 
     </td>
 
@@ -14,7 +14,7 @@
 
     </td>
 
-    <td height="40" width="75" background="[% image_url %]/bar_left.gif" align="right" valign="middle">
+    <td height="40" width="80" background="[% image_url %]/bar_left.gif" align="right" valign="middle">
         <a href="[% right_link %]"><span class="plain"><span class="number">[% right %]</span></span></a>
     </td>
 
