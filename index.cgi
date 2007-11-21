@@ -6,14 +6,12 @@ use strict;
 use OurCal;
 use OurCal::Config;
 use OurCal::Handler;
-use OurCal::Provider;
 use OurCal::View;
 
 $|++;
 
 my $config    = OurCal::Config->new( file => 'ourcal.conf' );
-my $provider  = OurCal::Provider->new( config => $config );
-my $handler   = OurCal::Handler->new;
+my $handler   = OurCal::Handler->new( config => $config);
 my $cal       = OurCal->new( date => $handler->date, user => $handler->user, config => $config );
 my $view      = OurCal::View->load_view($handler->view, config => $config->config, calendar => $cal); 
 
