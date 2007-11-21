@@ -63,7 +63,7 @@
 </tr>
 
 
-[% FOREACH todo =  calendar.todos%]
+[% FOREACH todo =  calendar.todos %]
 
 <tr>
         <td width="10"> &nbsp; </td>
