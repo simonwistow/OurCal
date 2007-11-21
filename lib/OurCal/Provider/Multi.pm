@@ -20,7 +20,7 @@ sub new {
 
 sub todos {
     my $self = shift;
-    return $self->_gather('todos', @_);
+    return $self->_gather('todos');
 }
 
 sub providers {
@@ -49,7 +49,6 @@ sub users {
     my $self = shift;
     return $self->_gather('users', @_);
 }
-
 
 sub _gather {
     my $self = shift;

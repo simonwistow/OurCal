@@ -2,6 +2,7 @@ package OurCal::Handler;
 
 use strict;
 use CGI;
+use CGI::Carp qw(fatalsToBrowser);
 
 my $user_cookie_name = 'ourcal_user_cookie';
 
@@ -19,6 +20,10 @@ sub _get_default_date {
     return $default;
 }
 
+
+sub view {
+    return $_[0]->_get_with_default('view', 'html');
+}
 
 sub date {
     return $_[0]->_get_with_default('date', _get_default_date);
@@ -105,10 +110,10 @@ sub link {
     my $date = $span->date;
     my $user = $self->user;
     my $url  = "?";
-	
+    
     $url .= "date=${date}" unless $span->is_this_span && $span->isa("OurCal::Month");
     $url .= "&user=${user}" if $self->need_user;
-	$url  = "." if $url eq "?";
+    $url  = "." if $url eq "?";
 
     return $url;    
 }

@@ -106,4 +106,10 @@ sub del_event {
     $self->{provider}->del_event($event);
 }
 
+=head1 DESIGN
+
+designed by http://www.chimpfactory.com/
+
+=cut
+
 1;

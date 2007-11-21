@@ -1,4 +1,4 @@
-package OurCal::ICalendar;
+package OurCal::View::ICalendar;
 
 use strict;
 
@@ -20,8 +20,9 @@ sub mime_type {
     return "text/calendar";
 }
 
-sub events {
+sub handle {
     my $self   = shift;
+    my $mode   = shift;
     my %opts   = @_;
     $opts{limit} ||= 50;
 
