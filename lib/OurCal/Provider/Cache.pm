@@ -6,16 +6,48 @@ use File::Path;
 use Storable;
 use OurCal::Provider;
 
+=head1 NAME
+
+OurCal::Provider::Cache - a caching provider 
+
+=head1 SYNOPSIS
+
+    [a_cache]
+    type  = cache
+    dir   = .cache
+    child = a_provider
+
+=head1 CONFIG OPTIONS
+
+=over 4
+
+=item dir
+
+The directory to cache into. Defaults to '.cache'
+
+=item child
+
+An optional child to cache stuff from. This will instantiate the 
+provider and feed stuff through to it, caching appropriately.
+
+=item cache_expiry
+
+How long to cache for in seconds. Defaults to 1800 (30 mins).
+
+=back
+
+=cut
+
 sub new {
     my $class = shift;
     my %what  = @_;
     my $conf  = $what{config}->config($what{name});
     if (defined $conf->{child}) {
         $what{_provider}      = OurCal::Provider->load_provider($conf->{child}, $what{config}); 
-        $what{_provider_name} = $conf->{child}; 
+            $what{_provider_name} = $conf->{child}; 
     }
-    $what{_cache_dir}     = $conf->{dir};
-    $what{_cache_expiry}  = 60*30 unless defined $what{_cache_expiry};
+    $what{_cache_dir}     = $conf->{dir} || '.cache';
+    $what{_cache_expiry}  = $conf->{cache_expiry} || 60 * 30;
     return bless \%what, $class;
 }
 
@@ -72,6 +104,16 @@ sub _do_cached {
     my $file   = $self->{_provider_name}."+".$sub."@".$self->_flatten_args($thing, @_);
     return $self->cache($file, sub { $self->{_provider}->$sub($thing, @_) });
 }
+
+
+=head cache <file> <subroutine>
+
+Retrieve the cache file and returns a list of objects serialised in it.
+
+If the cache has expired then runs the subroutine passed to fetch more 
+data.
+
+=cut
 
 # TODO perhaps the caching code should be refactored out into
 # ::Cache::Simple and ::Provider::Cache could take an optional

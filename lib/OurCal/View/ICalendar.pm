@@ -11,18 +11,46 @@ use Text::Chump;
 use CGI qw(:standard);
 use URI::Find::Simple qw(list_uris);
 
+
+=head1 NAME
+
+OurCal::View::ICalendar - an ICalendar view
+
+=head1 METHODS
+
+=cut
+
+
+=head2 new <param[s]>
+
+=cut
+
 sub new {
     my ($class, %what) = @_;
     return bless \%what, $class;
 }
 
+=head2 mime_type 
+
+Returns the mime type of this view - 'text/calendar'
+
+=cut
+
 sub mime_type {
     return "text/calendar";
 }
 
+=head2 handle <param[s]>
+
+Returns a string of ICalendar representing events and todo items.
+
+Can optionally take a limit param which describes the number of events 
+to have. Defaults to 50.
+
+=cut
+
 sub handle {
     my $self   = shift;
-    my $mode   = shift;
     my %opts   = @_;
     $opts{limit} ||= 50;
 

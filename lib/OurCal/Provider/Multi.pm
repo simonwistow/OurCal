@@ -3,6 +3,30 @@ package OurCal::Provider::Multi;
 use strict;
 use OurCal::Provider;
 
+
+=head1 NAME
+
+OurCal::Provider::Multi - aggregate multiple providers
+
+=head1 SYNOPSIS
+
+    [a_multi_provider]
+    providers = something another 
+    type      = multi
+
+=head1 CONFIG OPTIONS
+
+=over 3 
+
+=item providers
+
+A space separated list of other provider names
+
+=back
+
+=cut
+
+
 sub new {
     my $class = shift;
     my %what  = @_;

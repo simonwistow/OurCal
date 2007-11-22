@@ -5,22 +5,43 @@ use Template;
 use OurCal::Todo;
 use OurCal::Event;
 
+=head1 NAME
+
+OurCal::View::HTML - an HTML view for OurCal
+
+=head1 METHODS
+
+=cut
+
+=head2 new 
+
+=cut
+
 sub new {
     my ($class, %what) = @_;
     return bless \%what, $class;
 }
 
+
+=head2 mime_type
+
+Returns the mime_type for this view 'text/html'
+
 sub mime_type {
     return "text/html";
 }
 
+=head2 handle <opt[s]>
+
+Returns HTML representing the current mode.
+
 sub handle {
     my $self    = shift;
-    my $mode    = shift;
     my %opts    = @_;    
     my $handler = $self->{handler};
     my $config  = $self->{config};
     my $cal     = $self->{calendar};
+    my $mode    = $handler->mode;
 
 
     if ("save_todo" eq $mode) {
@@ -57,6 +78,16 @@ sub handle {
 
 
 }
+
+=head1 DESIGN
+
+The default template design is ripped off http://www.chimpfactory.com/ 
+with permission.
+
+Don't blame them for the horrible way it's implemented - that's all my
+fault.
+
+=cut
 
 
 1;

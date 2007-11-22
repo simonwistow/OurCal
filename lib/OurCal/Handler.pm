@@ -6,6 +6,25 @@ use CGI::Carp qw(fatalsToBrowser);
 
 my $user_cookie_name = 'ourcal_user_cookie';
 
+=head1 NAME
+
+OurCal::Handler - the default, cgi based handler for OurCal
+
+=head1 SYNOPSIS
+
+	my $config    = OurCal::Config->new( file => 'ourcal.conf' );
+	my $handler   = OurCal::Handler->new( config => $config );
+
+=head1 METHODS
+
+=cut
+
+=head2 new <param[s]>
+
+Requires a C<OurCal::Config> object passed in as the config param.
+
+=cut
+
 sub new {
     my ($class, %opts) = @_;
     $opts{_cgi} = CGI->new;
@@ -20,21 +39,38 @@ sub _get_default_date {
     return $default;
 }
 
+=head2 view
+
+Get the name of the view we should be using
+
+=cut
 
 sub view {
     return $_[0]->_get_with_default('view', 'html');
 }
 
+=head2 date
+
+Returns the date 
+
+=cut
+
+
 sub date {
     return $_[0]->_get_with_default('date', _get_default_date);
 }
+
+=head2 user
+
+Returns the user as defined by HTTP Basic Auth, cookie or user CGI 
+param.
+
+=cut
 
 sub user {
     my $self = shift;
     return undef if 'del_cookie' eq $self->mode;
     return $self->{user} if defined $self->{user} && length($self->{user});
-
-    
 
     $self->{_user_needed} = 0;
 
@@ -65,6 +101,12 @@ sub user {
     return $user;
 }
 
+=head2 mode
+
+Get what mode we should be using
+
+=cut
+
 sub mode {
     return $_[0]->_get_with_default('mode', 'display');
 }
@@ -77,6 +119,12 @@ sub _get_with_default {
     return $self->{$name};
 }
 
+
+=head2 header <mime type>
+
+Return what header we need to print out.
+
+=cut
 
 sub header {
     my $self = shift;
@@ -96,6 +144,8 @@ sub header {
     
 }
 
+
+
 sub id {
     return $_[0]->_get_with_default('id');
 }    
@@ -103,6 +153,12 @@ sub id {
 sub description {
     return $_[0]->_get_with_default('description');
 }    
+
+=head2 link <span>
+
+Make a link out a C<OurCal::Span> object
+
+=cut
 
 sub link {
     my $self = shift;
@@ -118,13 +174,20 @@ sub link {
     return $url;    
 }
 
+=head2 param <name>
+
+Get a CGI parma with the given name
+
+=cut
+
 sub param {
     my $self = shift;
     my $name = shift;
     my $cgi  = $self->{_cgi};
     return $cgi->param($name);
-
 }
+
+# TODO this really needs tidying up.
 
 sub next_link {
     my $self = shift;

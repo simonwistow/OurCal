@@ -4,6 +4,37 @@ use strict;
 use DBI;
 use Carp qw(confess cluck);
 
+
+=head1 NAME
+
+OurCal::Provider::DBI -  a DBI provider for OurCal
+
+=head1 SYNOPSIS
+
+    [a_dbi_provider]
+    dsn  = dbi:SQLite:ourcal
+    type = dbi
+
+=head1 CONFIG OPTIONS
+
+=over 4 
+
+=item dsn
+
+A C<DBI> dsn. Required.
+
+=item user
+
+A user name. Optional.
+
+=item pass
+
+A password. Optional.
+
+=back
+
+=cut
+
 sub new {
     my $class  = shift;
     my %what   = @_;
@@ -21,7 +52,7 @@ sub events {
     my ($sth,$sql)  = $self->_events(%opts);
     my @events;
     while (my $d = $sth->fetchrow_hashref()) {
-		$d->{editable} = 1;
+        $d->{editable} = 1;
         my $e = OurCal::Event->new(%$d);
         push @events, $e;
     }

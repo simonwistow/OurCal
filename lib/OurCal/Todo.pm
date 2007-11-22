@@ -1,27 +1,69 @@
 package OurCal::Todo;
+
+use strict;
+
+=head1 NAME 
+
+OurCal::Todo -  a TODO class for OurCal
+
+=head1 METHODS
+
+
+=cut 
+
+
+=head2 new
+
+Requires a description param and optionally a for and an id param.
                 
+=cut
+
+
 sub new {
     my ($class, %todo) = @_;
 
     return bless \%todo, $class;   
 }
 
+=head2 id
+
+The id of the TODO
+
+=cut
+
 sub id {
     my $self = shift;
     return $self->{id};
-}                
+}   
+
+=head2 description
+
+The description of the TODO
+
+=cut             
         
 sub description {
     my $self = shift;
     return $self->trim($self->{description});
 }
-        
+    
+=head2 for
+
+Who the TODO is for
+
+=cut
+    
 sub for {
     my $self = shift;
     return $self->{for};
         
 }
-         
+    
+=head2 full_description
+
+The Description plus the for if it's present
+
+=cut     
                 
 sub full_description {
     my ($self) = @_;

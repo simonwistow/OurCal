@@ -11,6 +11,33 @@ use OurCal::Provider;
 use Carp qw(cluck);
 use Digest::MD5 qw(md5_hex);
 
+
+=head1 NAME
+
+OurCal::Provider::ICalendar - an RFC2445 provider for OurCal
+
+=head1 SYNOPSIS
+
+    [an_ical_provider
+    type = icalendar
+    file = path/to/file.ics
+
+=head1 CONFIG OPTIONS
+
+=over 4 
+
+=item file
+
+The ics file. Can either be a local file or a url of one.
+
+=item cache
+
+The name of a cache provider. This will cache fetching the file.
+
+=back
+
+=cut
+
 sub new {
     my $class = shift;
     my %what  = @_;
@@ -78,6 +105,7 @@ sub to_event {
     my $self  = shift;
     my $event = shift;
     my %what;
+    $what{id}          = $event->property('id');
     $what{date}        = $event->start->strftime("%Y-%m-%d");
     $what{description} = $event->summary;    
     $what{recurring}   = $event->property('rrule') or $event->property('rdate'); 

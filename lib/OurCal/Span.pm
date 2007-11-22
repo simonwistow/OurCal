@@ -4,6 +4,19 @@ use strict;
 use Carp qw(confess);
 use DateTime;
 
+
+=head1 NAME
+
+OurCal::Span - a base class for OurCal spans of time
+
+=head1 METHODS
+
+=head2 new <param[s]>
+
+Must have a date param 
+
+=cut
+
 sub new {
     my ($class, %what)  = @_;
     my $self = bless \%what, $class;
@@ -20,10 +33,17 @@ sub new {
     return $self;
 }
 
+=head2 date
+
+The date for this span
+
+=cut
+
 sub date {
     my $self = shift;
     return $self->{date};
 }
+
 sub calendar {
     my $self = shift;
     return $self->{calendar};
