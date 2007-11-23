@@ -44,6 +44,12 @@ sub date {
     return $self->{date};
 }
 
+=head2 calendar
+
+Return the OurCal calendar object this is attached to
+
+=cut
+
 sub calendar {
     my $self = shift;
     return $self->{calendar};

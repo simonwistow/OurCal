@@ -30,7 +30,7 @@ The description of the event
                 
 sub description {
     my $self = shift;
-    return $self->trim($self->{description});
+    return $self->_trim($self->{description});
 }
       
 
@@ -79,7 +79,7 @@ sub editable {
 }
 
 
-sub trim {
+sub _trim {
     my($self, $text) = @_;
     $text =~ s/^\s*(.+=?)\$/$1/;
     return $text;

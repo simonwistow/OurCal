@@ -55,7 +55,7 @@ Read individual providers for config options.
 
 =head2 new <param[s]>
 
-Requires an C<OurCal::Config> object as config object.
+Requires an C<OurCal::Config> object as config param.
 
 Authomatically instantiates the default provider.
 
@@ -182,7 +182,7 @@ sub save_todo {
     return $self->_do_default('save_todo', @_);
 }
 
-=head2 save_todo <OurCal::Todo>
+=head2 del_todo <OurCal::Todo>
 
 Delete a todo.
 
@@ -204,7 +204,7 @@ sub save_event {
     return $self->_do_default('save_event', @_);
 }
 
-=head2 delete_event <OurCal::Event>
+=head2 del_event <OurCal::Event>
 
 Delete an event..
 

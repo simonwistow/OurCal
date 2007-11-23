@@ -6,6 +6,7 @@ use OurCal::Month;
 use OurCal::Provider;
 use Data::Dumper;
 
+our $VERSION = '1.0';
 
 =head1 NAME
 

@@ -44,7 +44,7 @@ The description of the TODO
         
 sub description {
     my $self = shift;
-    return $self->trim($self->{description});
+    return $self->_trim($self->{description});
 }
     
 =head2 for
@@ -78,7 +78,7 @@ sub full_description {
     return $description;
 }
 
-sub trim {
+sub _trim {
     my($self, $text) = @_;
 
     $text =~ s/^\s*(.+=?)\$/$1/;

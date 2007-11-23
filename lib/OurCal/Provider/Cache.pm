@@ -36,6 +36,14 @@ How long to cache for in seconds. Defaults to 1800 (30 mins).
 
 =back
 
+=head1 METHODS
+
+=cut
+
+=head2 new <param[s]>
+
+Requires an C<OurCal::Config> object as config param and a name param.
+
 =cut
 
 sub new {
@@ -106,7 +114,7 @@ sub _do_cached {
 }
 
 
-=head cache <file> <subroutine>
+=head2 cache <file> <subroutine>
 
 Retrieve the cache file and returns a list of objects serialised in it.
 
@@ -155,6 +163,42 @@ sub _do_default {
     return unless defined $self->{_provider};    
     return $self->{_provider}->$sub($thing, @_);
 }
+
+=head2 todos
+
+Returns all the todos on the system.
+
+=head2 has_events <param[s]>
+
+Returns whether there are events given the params.
+
+=head2 events <param[s]>
+
+Returns all the events for the given params.
+
+=head2 users
+
+Returns the name of all the users on the system.
+
+=head2 save_todo <OurCal::Todo>
+
+Save a todo.
+
+=head2 del_todo <OurCal::Todo>
+
+Delete a todo.
+
+
+=head2 save_event <OurCal::Event>
+
+Save an event.
+
+=head2 del_event <OurCal::Event>
+
+Delete an event..
+
+=cut
+
 
 1;
 

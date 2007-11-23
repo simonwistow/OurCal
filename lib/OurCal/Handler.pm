@@ -146,14 +146,6 @@ sub header {
 
 
 
-sub id {
-    return $_[0]->_get_with_default('id');
-}    
-
-sub description {
-    return $_[0]->_get_with_default('description');
-}    
-
 =head2 link <span>
 
 Make a link out a C<OurCal::Span> object
@@ -187,19 +179,11 @@ sub param {
     return $cgi->param($name);
 }
 
-# TODO this really needs tidying up.
+=head2 need_user
 
-sub next_link {
-    my $self = shift;
-    my $span = shift;
-    return $self->link($span->next);
-}
+Whether a link need to include a user param or not
 
-sub previous_link {
-    my $self = shift;
-    my $span = shift;
-    return $self->link($span->previous);
-}
+=cut
 
 
 sub need_user {

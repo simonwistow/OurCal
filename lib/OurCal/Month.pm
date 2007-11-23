@@ -65,7 +65,7 @@ sub is_this_span {
     return $self->is_this_month;
 }
 
-=head is_this_month
+=head2 is_this_month
 
 Returns whether this month object is also the current month in the real 
 world
