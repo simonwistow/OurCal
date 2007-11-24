@@ -27,6 +27,8 @@ sub new {
 
 Returns the mime_type for this view 'text/html'
 
+=cut
+
 sub mime_type {
     return "text/html";
 }
@@ -34,6 +36,8 @@ sub mime_type {
 =head2 handle <opt[s]>
 
 Returns HTML representing the current mode.
+
+=cut
 
 sub handle {
     my $self    = shift;

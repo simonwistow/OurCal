@@ -14,9 +14,9 @@ $|++;
 my $config    = OurCal::Config->new( file => 'ourcal.conf' );
 my $handler   = OurCal::Handler::CGI->new( config => $config );
 my $cal       = OurCal->new( date => $handler->date, user => $handler->user, config => $config );
-my $view      = OurCal::View->load_view($handler->view, config => $config->config, calendar => $cal); 
+my $view      = OurCal::View->load_view($handler->view, handler => $handler, config => $config->config, calendar => $cal); 
 
 
 print $handler->header($view->mime_type);
-print $view->handle($handler->mode);
+print $view->handle();
 
