@@ -1,4 +1,4 @@
-package OurCal::Handler;
+package OurCal::Handler::CGI;
 
 use strict;
 use CGI;
@@ -8,12 +8,12 @@ my $user_cookie_name = 'ourcal_user_cookie';
 
 =head1 NAME
 
-OurCal::Handler - the default, cgi based handler for OurCal
+OurCal::Handler::CGI - the default, cgi based handler for OurCal
 
 =head1 SYNOPSIS
 
 	my $config    = OurCal::Config->new( file => 'ourcal.conf' );
-	my $handler   = OurCal::Handler->new( config => $config );
+	my $handler   = OurCal::Handler::CGI->new( config => $config );
 
 =head1 METHODS
 

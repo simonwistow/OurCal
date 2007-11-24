@@ -273,15 +273,7 @@ Distributed under the same terms as Perl itself
 
 =head1 SEE ALSO
 
-L<OurCal::Provider>, L<OurCal::View>, L<OurCal::Handler>, 
-L<OurCal::Config>
-
-=head1 DESIGN
-
-The design is ripped off  http://www.chimpfactory.com/ with permission.
-
-Don't blame them for the horrible way it's implemented - that's all my 
-fault.
+L<OurCal::Provider>, L<OurCal::View>, L<OurCal::Handler>, L<OurCal::Config>
 
 =cut
 
