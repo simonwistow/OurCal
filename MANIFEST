@@ -48,3 +48,5 @@ templates/header
 templates/macros
 templates/month
 TODO
+Makefile.PL
+META.yml
