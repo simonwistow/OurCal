@@ -14,3 +14,11 @@ Which is the same as
 
 	ourcal init --handler=cgi --default_provider=dbi 
 
+=cut
+
+# TODO
+# Install templates and images in a shared directory
+# Look for a conf file in the current directory
+# Allow Handlers and Providers to have an init()
+
+
