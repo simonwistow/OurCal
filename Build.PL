@@ -5,6 +5,7 @@ my $build = Module::Build
   ->new( module_name  => "OurCal",
          license      => 'perl',
          version_from => 'lib/OurCal.pm',
+         script       => [ 'ourcal' ],
          requires     => {
                             'CGI'                      => 0, 
                             'CGI::Carp'                => 0,

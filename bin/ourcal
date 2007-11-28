@@ -1,0 +1,16 @@
+#!perl -w
+
+use strict;
+
+=head1 NAME
+
+ourcal - utility script for OurCal calendaring system
+
+=head1 USAGE
+
+	ourcal init
+
+Which is the same as
+
+	ourcal init --handler=cgi --default_provider=dbi 
+
