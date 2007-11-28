@@ -1,5 +1,4 @@
 Build.PL
-calendar.sql
 images/add.gif
 images/bar_left.gif
 images/bar_left_end.gif
@@ -36,6 +35,7 @@ lib/OurCal/View/HTML.pm
 lib/OurCal/View/ICalendar.pm
 MANIFEST			This list of files
 ourcal.conf
+sql/calendar.sql
 t/00use.t
 t/pod-coverage.t
 t/pod.t
