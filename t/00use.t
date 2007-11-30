@@ -7,7 +7,7 @@ use_ok("OurCal");
 use_ok("OurCal::Config");
 use_ok("OurCal::Day");
 use_ok("OurCal::Event");
-use_ok("OurCal::Handler");
+use_ok("OurCal::Handler::CGI");
 use_ok("OurCal::Month");
 use_ok("OurCal::Provider");
 use_ok("OurCal::Provider::Cache");
