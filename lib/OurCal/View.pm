@@ -27,7 +27,7 @@ sub new {
 
 =head2 views
 
-Returns a has with key-value pairs representing the shortname and 
+Returns a hash with key-value pairs representing the shortname and 
 equivalent class for all views installed.
 
 =cut

@@ -1,14 +1,16 @@
 <html>
 <head>
 	<title>[% title %]</title>
-	<link rel="stylesheet" type="text/css" href="[% image_url %]/style.css">
+	<link rel="stylesheet" type="text/css" href="[% image_url %]/style.css" />
+	[%- FOREACH view = calendar.views.hash %]
+	[%- NEXT IF "html" == view.key %]
+	[%- USE class = Class(view.value) %]
+	<link rel="alternate"  type="[% class.mime_type  %]" href="[% handler.link(span, 'view', view.key) %]" title="[% title %] - [% view.key %]" />
+	[%- END %]
 </head>
 <body bgcolor="#ffffff">
 
-
 [% USE Chump %]
 [% PROCESS macros %]
-
-[% USE urlmaker=url('http://thegestalt.org/simon/cal/') %]
 
 <center>

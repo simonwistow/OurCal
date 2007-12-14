@@ -4,9 +4,10 @@ use strict;
 use OurCal::Day;
 use OurCal::Month;
 use OurCal::Provider;
+use OurCal::View;
 use Data::Dumper;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 =head1 NAME
 
@@ -260,6 +261,40 @@ sub del_event {
     my $event = shift;
     $self->{provider}->del_event($event);
 }
+
+=head2 views 
+
+Returns a hash with key-value pairs representing the shortname and
+equivalent class for all views installed.
+
+=cut
+
+sub views { return OurCal::View->views }
+
+=head2 load_view <name>
+
+Returns an object representing a view of the same name of a type,
+defined in the config and found in C<views>. Authomatically passes in
+the correct config.
+
+=cut
+
+sub load_view {
+    my $self = shift;
+    my $name = shift;
+    return OurCal::View->load_view($name);
+}
+
+
+
+=head2 providers
+
+Returns a hash of all providers installed on the system as key-value
+pairs of the name of the provider and class it represents.
+
+=cut
+
+sub providers { return OurCal::View->providers }
 
 =head1 AUTHOR
 

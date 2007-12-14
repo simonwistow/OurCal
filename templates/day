@@ -1,9 +1,8 @@
 [% PROCESS header
-    title = day.as_long_string
+    title    = day.as_long_string
+    calendar = calendar
+    span     = day
 %]
-
-[% USE url('/simon/cal/') %]
-
 
 [% INCLUDE bar
     left_link   = handler.link(day.prev)

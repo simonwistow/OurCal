@@ -3,6 +3,7 @@ package OurCal::Handler::CGI;
 use strict;
 use CGI;
 use CGI::Carp qw(fatalsToBrowser);
+use URI;
 
 my $user_cookie_name = 'ourcal_user_cookie';
 
@@ -12,8 +13,8 @@ OurCal::Handler::CGI - the default, cgi based handler for OurCal
 
 =head1 SYNOPSIS
 
-	my $config    = OurCal::Config->new( file => 'ourcal.conf' );
-	my $handler   = OurCal::Handler::CGI->new( config => $config );
+    my $config    = OurCal::Config->new( file => 'ourcal.conf' );
+    my $handler   = OurCal::Handler::CGI->new( config => $config );
 
 =head1 METHODS
 
@@ -155,15 +156,19 @@ Make a link out a C<OurCal::Span> object
 sub link {
     my $self = shift;
     my $span = shift;
+    my %opt  = @_;
     my $date = $span->date;
     my $user = $self->user;
-    my $url  = "?";
-    
-    $url .= "date=${date}" unless $span->is_this_span && $span->isa("OurCal::Month");
-    $url .= "&user=${user}" if $self->need_user;
-    $url  = "." if $url eq "?";
 
-    return $url;    
+    my $uri  = URI->new;
+    
+     $opt{date} = $date unless $span->is_this_span && $span->isa("OurCal::Month");
+    $opt{user} = $user if $self->need_user;
+
+    $uri->query_form(%opt);
+    
+    my $url = $uri->query;
+    return ("" eq $url)? "." : "?${url}";
 }
 
 =head2 param <name>

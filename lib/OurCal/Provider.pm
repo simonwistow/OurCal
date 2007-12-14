@@ -11,7 +11,7 @@ OurCal::Provider - class for getting events and TODOs from the system
 
 =head1 CONFIGURATION
 
-Teh default provider is a Multi provider named C<providers>. This means 
+The default provider is a Multi provider named C<providers>. This means 
 that you can do
 
     [providers]
@@ -57,7 +57,7 @@ Read individual providers for config options.
 
 Requires an C<OurCal::Config> object as config param.
 
-Authomatically instantiates the default provider.
+Automatically instantiates the default provider.
 
 =cut
 
@@ -103,7 +103,7 @@ sub providers {
     return %providers;
 }
 
-=head2 load_provider <name>
+=head2 load_provider <name> <config> [option[s]]
 
 Load a provider with a given name as defined in the config and returns 
 it as an object.
