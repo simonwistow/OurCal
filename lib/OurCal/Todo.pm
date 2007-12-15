@@ -21,7 +21,11 @@ Requires a description param and optionally a for and an id param.
 
 sub new {
     my ($class, %todo) = @_;
-
+    my $desc = $class->_trim($todo{description});
+    if ($desc =~ s!^\(([^)]+)\)\s*!!) {
+        $todo{description} = $desc;
+        $todo{for}         = $1;
+    }
     return bless \%todo, $class;   
 }
 
@@ -55,8 +59,7 @@ Who the TODO is for
     
 sub for {
     my $self = shift;
-    return $self->{for};
-        
+    return $self->_trim($self->{for});
 }
     
 =head2 full_description

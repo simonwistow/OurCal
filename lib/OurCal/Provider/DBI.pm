@@ -3,7 +3,8 @@ package OurCal::Provider::DBI;
 use strict;
 use DBI;
 use Carp qw(confess cluck);
-
+use OurCal::Todo;
+use OurCal::Event;
 
 =head1 NAME
 

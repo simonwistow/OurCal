@@ -4,6 +4,7 @@ use strict;
 
 use Data::ICal::DateTime;
 use Data::ICal::Entry::Event;
+use Data::ICal::Entry::Todo;
 use Digest::MD5 qw(md5_hex);
 use HTTP::Date;
 use DateTime;
@@ -57,11 +58,10 @@ sub handle {
     my $tc     = Text::Chump->new;
     $tc->install('link', sub { return "$_[2] ($_[1])" });
 
-    my @events = $self->{calendar}->events(%opts);
     my $cal    = Data::ICal->new();
 
 
-    foreach my $item (@events) {
+    foreach my $item ($self->{calendar}->events(%opts)) {
        my $event = Data::ICal::Entry::Event->new;
        my $date  = $self->_make_date($item->date);
        my $uid   = md5_hex($date.$item->description);
@@ -81,6 +81,20 @@ sub handle {
 
        $cal->add_entry($event);
     }
+
+    foreach my $todo ($self->{calendar}->todos) {
+        my $entry = Data::ICal::Entry::Todo->new;
+        $entry->add_properties(
+            summary => $todo->description,
+            status  => 'INCOMPLETE',
+        );
+        my $who = $todo->for; 
+        if (defined $who && $who ne "") {
+            $entry->add_property(organizer => "MAILTO:$who");
+        }
+        $cal->add_entry($entry);
+    }
+
     return $cal->as_string;
 
 }
