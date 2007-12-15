@@ -81,6 +81,18 @@ sub full_description {
     return $description;
 }
 
+=head2 editable
+
+Is this todo editable.
+
+=cut
+
+sub editable {
+    my $self = shift;
+    return $self->{editable} || 0;
+}
+
+
 sub _trim {
     my($self, $text) = @_;
 

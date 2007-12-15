@@ -71,7 +71,7 @@
         [% IF todo.for %]<span class="bolddark">[% todo.for %]&nbsp;</span>[% END %]
         <span class="plain"> 
              [% todo.description FILTER chump %]
-             [% del_form(month, {"mode" => "del_todo", "id" => todo.id }) %]
+             [% IF todo.editable; del_form(month, {"mode" => "del_todo", "id" => todo.id }); END %]
          </span>
         </td>
 </tr>

@@ -1,6 +1,12 @@
 #!perl -w
 
 use strict;
+use File::ShareDir qw(dist_dir);
+use File::Copy::Recursive;
+use OurCal::Config;
+use OurCal::View;
+use OurCal::Handler;
+use OurCal::Provider;
 
 =head1 NAME
 
@@ -8,17 +14,52 @@ ourcal - utility script for OurCal calendaring system
 
 =head1 USAGE
 
-	ourcal init
+	ourcal init 
 
 Which is the same as
 
 	ourcal init --handler=cgi --default_provider=dbi 
 
+You can provide other providers  as 
+
+	ourcal init --providers <name>=<type> <name>=<type> 	
+
 =cut
 
-# TODO
-# Install templates and images in a shared directory
-# Look for a conf file in the current directory
-# Allow Handlers and Providers to have an init()
+# Work out what we're doing
+
+# TODO 
+# Get a passed config
+# Or find an existing one
+# Or write a default one
+
+# Now set up the values
+# Command Line, Config, Default
+my $handler_name  = 'cgi';
+my $provider_name = 'dbi';
+
+my %handlers  = OurCal::Handler->handlers;
 
 
+# Now initialise the handler
+my $handler  = $handlers{lc($handler_name)} 
+	|| die "Couldn't find a class for handler $handler_name\n"; 
+
+
+print "Initialising handler $handler_name of class $handler\n";
+
+
+# And all the providers 
+my %providers = OurCal::Provider->providers;
+
+my $provider = $providers{lc($provider_name)} 
+	|| die "Couldn't find a class for provider $provider_name\n"; 
+
+print "Initialising provider $provider_name of class $provider\n";
+
+
+# Now initialise the views
+my %views     = OurCal::View->views;
+# All of them unless we've been passed some
+
+# Write out the config again

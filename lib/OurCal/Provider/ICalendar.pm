@@ -7,6 +7,7 @@ use DateTime;
 use DateTime::Span;
 use File::Spec;
 use OurCal::Event;
+use OurCal::Todo;
 use OurCal::Provider;
 use Carp qw(cluck);
 use Digest::MD5 qw(md5_hex);
@@ -69,7 +70,30 @@ sub users {
 }
 
 sub todos {
-    return ();
+    my $self  = shift;
+    my %opts  = @_;
+    my $data  = $self->_fetch_data;
+    return () unless $data;
+    my $cal   = Data::ICal->new->parse( data => $data );
+    return () unless $cal;
+	my @todos;
+	foreach my $todo (grep  { $_->ical_entry_type eq 'VTODO' } @{$cal->entries}) {
+	    my $entry = { description => $todo->property('summary')->[0]->value };
+	    my $who   = $todo->property('organizer');
+		if (defined $who) {
+			$entry->{for} = $who->[0]->value;
+		}
+    	push @todos, $entry;
+	}
+    return map { $self->_to_todo($_) } @todos;
+}
+
+sub _to_todo {
+	my $self = shift;
+	my $what = shift;
+
+	$what->{for} =~ s!^mailto:!!i if defined $what->{for};
+	return OurCal::Todo->new(%$what);
 }
 
 sub events {
@@ -77,7 +101,7 @@ sub events {
     my %opts  = @_;
     my $data  = $self->_fetch_data;
     return () unless $data;
-    my $cal   = Data::ICal->new( data => $data );
+    my $cal   = Data::ICal->new->parse( data => $data );
     return () unless $cal;
     my @vals;
     if (defined $opts{date}) {

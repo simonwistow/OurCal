@@ -127,6 +127,7 @@ sub todos {
 
     my @todos;
     while (my $d = $sth->fetchrow_hashref()) {
+        $d->{editable} = 1;
         my $t = OurCal::Todo->new(%$d);
         push @todos, $t;
     }
