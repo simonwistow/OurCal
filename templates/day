@@ -1,3 +1,4 @@
+
 [% PROCESS header
     title    = day.as_long_string
     calendar = calendar
@@ -37,11 +38,11 @@
     </td>
     <td width="590" align="left">
         <div class="vevent">
-        <abbr class="dtstart" style="visibility:hidden; font-size: 0px;" title="[% day.date %]">[% day.as_long_string %]</abbr>
+        <abbr class="dtstart" title="[% day.date %]"><span style="visibility:hidden; display:none;">[% day.as_long_string %]</span></abbr>
         <span class="summary"> 
             [% event.description FILTER chump %]
-            [% IF event.editable; del_form(day, { "mode" => "del_event", "id" =>  event.id }); END %]
         </span>
+        [% IF event.editable; del_form(day, { "mode" => "del_event", "id" =>  event.id }); END %]
         </div>
     </td>
 </tr>
