@@ -8,7 +8,7 @@ use Module::Pluggable sub_name    => '_views',
 
 =head2 NAME
 
-OurCal::View - base class for all OourCal views
+OurCal::View - base class for all OurCal views
 
 =head1 METHODS
 
