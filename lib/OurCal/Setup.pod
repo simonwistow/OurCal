@@ -17,7 +17,7 @@ or get it off CPAN.
 OurCal has a bunch of dependencies although most of them are fairly 
 standard - you probably have a large swathe of them, especially things 
 like C<LWP::Simple> and C<Template>. You only need 
-C<Data::ICal::DateTime> if you want C<.ics> support>.
+C<Data::ICal::DateTime> if you want C<.ics> support.
 
 =head2 MAKE AN INSTANCE
 
