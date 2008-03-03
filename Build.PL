@@ -37,12 +37,13 @@ my $build = $build_class
                             'Storable'                 => 0, 
                             'Template'                 => 0, 
                             'Template::Plugin::Class'  => 0, 
+                            'Template::Plugin::Chump'  => 0, 
                             'Test::More'               => '0.62',
                             'Text::Chump'              => 0, 
                             'UNIVERSAL::require'       => 0,
                             'URI::Find::Simple'        => 0, 
                         },
-         create_makefile_pl => 'passthru',
+         create_makefile_pl => 'passthrough',
        );
 
 #$build->{config}{__extras_from} = [ 'templates', 'images', 'index.cgi' ];
