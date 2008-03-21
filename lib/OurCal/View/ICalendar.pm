@@ -57,6 +57,8 @@ sub handle {
 
     my $tc     = Text::Chump->new;
     $tc->install('link', sub { return "$_[2] ($_[1])" });
+    my $tc2     = Text::Chump->new;
+    $tc2->install('link', sub { return "$_[2]" });
 
     my $cal    = Data::ICal->new();
 
@@ -73,7 +75,7 @@ sub handle {
        # start
        $event->start($date);
        # summary
-       $event->summary($desc);
+       $event->summary($tc2->chump($item->description));
        # description
        $event->description($desc);
        # url
