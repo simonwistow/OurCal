@@ -8,6 +8,7 @@ use OurCal::View;
 use Data::Dumper;
 
 our $VERSION = '1.3';
+our $DEBUG   = 0;
 
 =head1 NAME
 
@@ -94,7 +95,7 @@ param. No user validation is done.
 sub new {
     my $class     = shift;
     my %opts      = @_;
-    $opts{provider} ||= OurCal::Provider->new(config => $opts{config});
+    $opts{provider} ||= OurCal::Provider->get_provider(config => $opts{config});
     return bless \%opts, $class;
 }
 
