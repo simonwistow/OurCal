@@ -132,8 +132,8 @@ sub header {
     my $type = shift;
     my $cgi  = $self->{_cgi};
     my %vars;
-    $vars{"-type"} = $type if defined $type;
-
+    $vars{"-type"}    = $type if defined $type;
+    $vars{"-charset"} = "utf-8";
     if ('del_cookie' eq $self->mode) {
         my $cookie = $cgi->cookie(-name => $user_cookie_name, -value => '' );
         $vars{"-cookie"} = $cookie;
@@ -147,6 +147,17 @@ sub header {
 
 
 
+=head2 full_link <span>
+
+Make an absolute  link out a C<OurCal::Span> object
+
+=cut
+
+sub full_link {
+	my $self = shift;
+	return $self->_link(1, @_);
+}
+
 =head2 link <span>
 
 Make a link out a C<OurCal::Span> object
@@ -154,21 +165,28 @@ Make a link out a C<OurCal::Span> object
 =cut
 
 sub link {
+	my $self = shift;
+	return $self->_link(0, @_);
+}
+
+sub _link {
     my $self = shift;
+	my $full = shift;
     my $span = shift;
     my %opt  = @_;
     my $date = $span->date;
     my $user = $self->user;
 
-    my $uri  = URI->new;
+    my $uri  = URI->new($self->{_cgi}->url);
     
-     $opt{date} = $date unless $span->is_this_span && $span->isa("OurCal::Month");
+    $opt{date} = $date unless $span->is_this_span && $span->isa("OurCal::Month");
     $opt{user} = $user if $self->need_user;
 
     $uri->query_form(%opt);
-    
+    return "$uri" if $full;
+
     my $url = $uri->query;
-    return ("" eq $url)? "." : "?${url}";
+    return (!defined $url || "" eq $url)? "." : "?${url}";
 }
 
 =head2 param <name>
