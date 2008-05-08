@@ -95,7 +95,7 @@ sub editable {
 
 sub _trim {
     my($self, $text) = @_;
-
+	return unless defined $text;
     $text =~ s/^\s*(.+=?)\$/$1/;
 
     return $text;
