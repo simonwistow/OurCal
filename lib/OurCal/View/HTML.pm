@@ -4,6 +4,8 @@ use strict;
 use Template;
 use OurCal::Todo;
 use OurCal::Event;
+use File::ShareDir qw(dist_dir);
+use File::Spec::Functions qw(catdir);
 
 =head1 NAME
 
@@ -65,6 +67,8 @@ sub handle {
     }
 
 
+	my @template_path = ( $config->{template_path} ); 
+
     my $span = $cal->span_name;
     my $vars = {
         image_url  => $config->{image_url},
@@ -72,11 +76,10 @@ sub handle {
         calendar   => $cal,
         $span      => $cal->span,
     };
-    my $template = Template->new({ INCLUDE_PATH => $config->{template_path}, RELATIVE => 1}) || die "${Template::ERROR}\n";
-
+    my $template = Template->new({ INCLUDE_PATH => [@template_path], RELATIVE => 1}) || die "${Template::ERROR}\n";
 
     my $return;
-    $template->process($span,$vars, \$return)
+    $template->process($span, $vars, \$return)
         || die "Template process failed: ".$template->error()."\n";
     return $return;
 
