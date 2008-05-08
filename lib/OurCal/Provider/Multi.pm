@@ -1,7 +1,7 @@
 package OurCal::Provider::Multi;
 
 use strict;
-use OurCal::Provider;
+use base qw(OurCal::Provider::Base);
 
 
 =head1 NAME

@@ -5,6 +5,7 @@ use DBI;
 use Carp qw(confess cluck);
 use OurCal::Todo;
 use OurCal::Event;
+use base qw(OurCal::Provider::DBI);
 
 =head1 NAME
 

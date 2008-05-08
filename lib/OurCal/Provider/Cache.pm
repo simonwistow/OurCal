@@ -4,7 +4,8 @@ use strict;
 use File::Spec::Functions qw(catfile rel2abs);
 use File::Path;
 use Storable;
-use OurCal::Provider;
+use base qw(OurCal::Provider::Base);
+use Data::Dumper;
 
 =head1 NAME
 
@@ -108,11 +109,26 @@ sub _do_cached {
     my $self   = shift;
     my $sub    = shift;
     my $thing  = shift;
-    return unless defined $self->{_provider};    
-    my $file   = $self->{_provider_name}."+".$sub."@".$self->_flatten_args($thing, @_);
-    return $self->cache($file, sub { $self->{_provider}->$sub($thing, @_) });
+    return unless defined $self->{_provider}; 
+    return $self->do_cached($self->{_provider}, $sub, $thing, @_);   
 }
 
+=head2 do_cached <sub name> <thing> [arg[s]]
+
+Do something but cache it.
+
+=cut
+
+sub do_cached {
+    my $self     = shift;
+    my $provider = shift;
+    my $sub      = shift;
+    my $thing    = shift;
+    my @args     = @_;
+    my $file   = $provider->name."+".$sub."@".$self->_flatten_args($thing, @args);
+    $self->debug("do_cached got ".Dumper([($thing, @args)]));
+    return $self->cache($file, sub { $provider->$sub($thing, @args) });
+}
 
 =head2 cache <file> <subroutine>
 
@@ -129,6 +145,7 @@ data.
 sub cache {
     my $self   = shift;
     my $file   = shift;
+    $self->debug("Checking $file");
     my $sub    = shift;
     my $dir    = rel2abs($self->{_cache_dir});
     -d $dir   || eval { mkpath($dir) } || die "Couldn't create cache directory $dir: $@\n";
@@ -138,11 +155,15 @@ sub cache {
     my $time   = time;
     my @res    = ();
     if (-e $cache && ($time-$mtime < $expire)) {
+        $self->debug("Fetching $file from cache");
         @res  = @{Storable::retrieve( $cache )};
     } else {
+        $self->debug("Fetching $file from provider");
         @res =  $sub->();
+        $self->debug("Got results ".scalar(@res));
         Storable::store( [@res], $cache );
     }
+    $self->debug("Results: ".scalar(@res));
     return @res;
 }
 

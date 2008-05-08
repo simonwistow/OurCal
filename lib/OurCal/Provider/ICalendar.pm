@@ -1,17 +1,18 @@
 package OurCal::Provider::ICalendar;
 
 use strict;
-use LWP::Simple;
+use LWP::UserAgent;
 use Data::ICal::DateTime;
 use DateTime;
 use DateTime::Span;
 use File::Spec;
 use OurCal::Event;
 use OurCal::Todo;
-use OurCal::Provider;
 use Carp qw(cluck);
 use Digest::MD5 qw(md5_hex);
-
+use Encode;
+use utf8;
+use base qw(OurCal::Provider::Base);
 
 =head1 NAME
 
@@ -61,7 +62,7 @@ sub new {
     if ($conf->{cache}) {
         $what{_cache} = OurCal::Provider->load_provider($conf->{cache}, $what{config}); 
     }
-
+    $what{ua} = LWP::UserAgent->new;
     return bless \%what, $class;
 }
 
@@ -71,34 +72,55 @@ sub users {
 
 sub todos {
     my $self  = shift;
+    if ($self->{_cache}) {
+        return $self->{_cache}->do_cached($self, '_todos', @_);
+    } else {
+        return $self->_todos(@_);
+    }
+}
+
+sub _todos {
+    my $self = shift;
     my %opts  = @_;
     my $data  = $self->_fetch_data;
     return () unless $data;
     my $cal   = Data::ICal->new->parse( data => $data );
     return () unless $cal;
-	my @todos;
-	foreach my $todo (grep  { $_->ical_entry_type eq 'VTODO' } @{$cal->entries}) {
-	    my $entry = { description => $todo->property('summary')->[0]->value };
-	    my $who   = $todo->property('organizer');
-		if (defined $who) {
-			$entry->{for} = $who->[0]->value;
-		}
-    	push @todos, $entry;
-	}
+    my @todos;
+    foreach my $todo (grep  { $_->ical_entry_type eq 'VTODO' } @{$cal->entries}) {
+        my $entry = { description => $todo->property('summary')->[0]->value };
+        my $who   = $todo->property('organizer');
+        if (defined $who) {
+            $entry->{for} = $who->[0]->value;
+        }
+        push @todos, $entry;
+    }
     return map { $self->_to_todo($_) } @todos;
 }
 
 sub _to_todo {
-	my $self = shift;
-	my $what = shift;
+    my $self = shift;
+    my $what = shift;
 
-	$what->{for} =~ s!^mailto:!!i if defined $what->{for};
-	return OurCal::Todo->new(%$what);
+    $what->{for} =~ s!^mailto:!!i if defined $what->{for};
+    return OurCal::Todo->new(%$what);
 }
 
 sub events {
     my $self  = shift;
+    if ($self->{_cache}) {
+        return $self->{_cache}->do_cached($self, '_events', @_);
+    } else {
+        return $self->_events(@_);
+    }
+}
+
+use Data::Dumper;
+
+sub _events {
+    my $self  = shift;
     my %opts  = @_;
+    $self->debug("Got ".Dumper({%opts}));
     my $data  = $self->_fetch_data;
     return () unless $data;
     my $cal   = Data::ICal->new->parse( data => $data );
@@ -120,6 +142,7 @@ sub events {
     }
     
     my @events  = $cal->events(@vals);
+    $self->debug("Got ".scalar(@events)." events back");
     @events     = map { $_->explode(@vals) } @events if @vals;
     @events     = sort { $a->start->epoch <=> $b->start->epoch } @events;
     @events     = splice @events, 0, $opts{limit} if defined $opts{limit};
@@ -129,18 +152,43 @@ sub events {
 
 sub _fetch_data {
     my $self = shift;
-    return get($self->{file}) unless defined $self->{_cache};
+    return $self->_get  unless defined $self->{_cache};
     my $file = $self->{name}."@".md5_hex($self->{file});    
-    return ($self->{_cache}->cache( $file, sub { get($self->{file}) }))[0];    
+    return ($self->{_cache}->cache( $file, sub { $self->_get }))[0];    
+}
+
+sub _get {
+    my $self = shift;
+    my $res  = $self->{ua}->get($self->{file}, {}, { "Accept-Charset" => "utf-8" });
+    die $res->status_line unless $res->is_success;
+    my $content = ($res->is_success)? $res->content : undef;
+    return $content;
 }
 
 sub _to_event {
     my $self  = shift;
+    my $conf  = $self->{config};
     my $event = shift;
+    my $start = $event->start;
+    my $end   = $event->end;
+    my $tz    = $conf->config->{time_zone};
+    if (defined $tz) {
+        $start->set_time_zone( $tz ) if defined $start;
+        $end->set_time_zone( $tz ) if defined $end;
+    }
+    my $desc  = $event->summary;
+    my $url   = $event->url;
+    if (defined $url) {
+        $desc = "[$desc|$url]";
+    }
+    if (defined $start && defined $end) {
+        $desc .= " (".$start->strftime("%H:%m")."-".$end->strftime("%H:%m").")";
+    }
+    
     my %what;
     $what{id}          = $event->property('id');
-    $what{date}        = $event->start->strftime("%Y-%m-%d");
-    $what{description} = $event->summary;    
+    $what{date}        = $start->strftime("%Y-%m-%d");
+    $what{description} = $desc;
     $what{recurring}   = $event->property('rrule') or $event->property('rdate'); 
     $what{editable}    = 0;
     return OurCal::Event->new(%what);
