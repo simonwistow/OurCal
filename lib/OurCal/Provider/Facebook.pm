@@ -9,7 +9,7 @@ use OurCal::Event;
 use OurCal::Provider;
 use Carp qw(cluck);
 use Digest::MD5 qw(md5_hex);
-
+use Data::Dumper;
 
 =head1 NAME
 
@@ -78,6 +78,8 @@ sub new {
         $what{_cache} = OurCal::Provider->load_provider($conf->{cache}, $what{config}); 
     }
 
+    my $info = $what{client}->users->get_info( uids => [ $what{client}->users->get_logged_in_user ], fields => ['timezone'] );
+    $what{timezone} = $info->[0]->{timezone};
     return bless \%what, $class;
 }
 
@@ -93,6 +95,8 @@ sub events {
     my $self   = shift;
     my %opts   = @_;
 
+
+
     my %p;
     if (defined $opts{date}) {
         my @names = qw(year month day);
@@ -103,14 +107,16 @@ sub events {
             last unless $name;
             $conf{$name} = $bit;
         }
-        my $s    = DateTime->new(%conf)->truncate( to => 'day');
+        my $s    = DateTime->new(%conf)->subtract( seconds => $self->{timezone} * 60 * 60 ); # ->truncate( to => 'day'); # 
         my $e    = $s->clone->add( days => 1)->subtract( seconds => 1 );
         $p{start_time} = $s->epoch;
         $p{end_time}   = $e->epoch;
     }
 
     my ($events) = $self->_fetch_data(%p);
-    return map { $self->_to_event($_) } @$events;
+    $events ||= [];
+    die Dumper($events) unless ref($events) eq 'ARRAY';
+    return grep { defined } map { $self->_to_event($_) } @$events;
 }
 
 sub _fetch_data {
@@ -129,15 +135,16 @@ sub _fetch_data {
 sub _to_event {
     my $self  = shift;
     my $event = shift;
+
     # TODO multi day events
     my %what;
     my $url            = "http://www.facebook.com/event.php?eid=".$event->{eid};
     $what{id}          = $event->{eid};
     if ($event->{start_time}) {
-        $what{date}        = DateTime->from_epoch( epoch => $event->{start_time} )->strftime("%Y-%m-%d");
+        my $t          = $event->{start_time} + ($self->{timezone} * 60 * 60);
+        $what{date}    = DateTime->from_epoch( epoch => $t )->strftime("%Y-%m-%d");
     } else {
         return;
-        use Data::Dumper;
         die Dumper($event);
     }
     $what{description} = "[".$event->{name}."|${url}]";    
