@@ -19,9 +19,10 @@ OurCal::Provider::Facebook - an Facebook event provider for OurCal
 
     [facebook]
     type           = facebook
+    timezone       = -8
     api_key        = <api_key>
-    session_key    = <session key>
-    session_secret = <session_secret>
+	session_key    = <session key>
+	session_secret = <session_secret>
 
 =head1 CONFIG OPTIONS
 
@@ -30,9 +31,21 @@ OurCal::Provider::Facebook - an Facebook event provider for OurCal
 
 =item api_key
 
+Facebook API key
+
 =item session_key
 
+Facebook API session key
+
 =item session_secret
+
+Facebook API session secret
+
+=item timezone
+
+A number in hours of the difference bwteen your current timezone and GMT/UTC.
+
+If not present will be worked out from your Facebook account.
 
 =item cache
 
@@ -78,8 +91,13 @@ sub new {
         $what{_cache} = OurCal::Provider->load_provider($conf->{cache}, $what{config}); 
     }
 
-    my $info = $what{client}->users->get_info( uids => [ $what{client}->users->get_logged_in_user ], fields => ['timezone'] );
-    $what{timezone} = $info->[0]->{timezone};
+
+	if (defined $conf->{timezone}) {
+		$what{timezone} = $conf->{timezone};
+  	} else {
+		my $info = $what{client}->users->get_info( uids => [ $what{client}->users->get_logged_in_user ], fields => ['timezone'] );
+		$what{timezone} = $info->[0]->{timezone};
+	}
     return bless \%what, $class;
 }
 
@@ -97,7 +115,7 @@ sub events {
 
 
 
-    my %p;
+	my %p;
     if (defined $opts{date}) {
         my @names = qw(year month day);
         my @bits  = split /-/, $opts{date};
@@ -109,44 +127,44 @@ sub events {
         }
         my $s    = DateTime->new(%conf)->subtract( seconds => $self->{timezone} * 60 * 60 ); # ->truncate( to => 'day'); # 
         my $e    = $s->clone->add( days => 1)->subtract( seconds => 1 );
-        $p{start_time} = $s->epoch;
-        $p{end_time}   = $e->epoch;
-    }
+		$p{start_time} = $s->epoch;
+		$p{end_time}   = $e->epoch;
+	}
 
-    my ($events) = $self->_fetch_data(%p);
-    $events ||= [];
-    die Dumper($events) unless ref($events) eq 'ARRAY';
-    return grep { defined } map { $self->_to_event($_) } @$events;
+	my ($events) = $self->_fetch_data(%p);
+	$events ||= [];
+	die Dumper($events) unless ref($events) eq 'ARRAY';
+	return grep { defined } map { $self->_to_event($_) } @$events;
 }
 
 sub _fetch_data {
-    my $self = shift;
-    my %p    = @_;
-    my $client = $self->{client};
-    return $client->events->get(%p) unless defined $self->{_cache};
+	my $self = shift;
+	my %p    = @_;
+	my $client = $self->{client};
+	return $client->events->get(%p) unless defined $self->{_cache};
 
 
-    my $des  = $p{start_time} || "all";
-    my $file = $self->{name} . '@' . md5_hex($des);
+	my $des  = $p{start_time} || "all";
+	my $file = $self->{name} . '@' . md5_hex($des);
 
-    return ($self->{_cache}->cache( $file, sub { $client->events->get(%p)  }))[0];    
+	return ($self->{_cache}->cache( $file, sub { $client->events->get(%p)  }))[0];    
 }
 
 sub _to_event {
     my $self  = shift;
     my $event = shift;
 
-    # TODO multi day events
+	# TODO multi day events
     my %what;
-    my $url            = "http://www.facebook.com/event.php?eid=".$event->{eid};
+	my $url            = "http://www.facebook.com/event.php?eid=".$event->{eid};
     $what{id}          = $event->{eid};
-    if ($event->{start_time}) {
-        my $t          = $event->{start_time} + ($self->{timezone} * 60 * 60);
-        $what{date}    = DateTime->from_epoch( epoch => $t )->strftime("%Y-%m-%d");
-    } else {
-        return;
-        die Dumper($event);
-    }
+	if ($event->{start_time}) {
+		my $t          = $event->{start_time} + ($self->{timezone} * 60 * 60);
+	    $what{date}    = DateTime->from_epoch( epoch => $t )->strftime("%Y-%m-%d");
+	} else {
+		return;
+		die Dumper($event);
+	}
     $what{description} = "[".$event->{name}."|${url}]";    
     $what{recurring}   = 0;
     $what{editable}    = 0;
